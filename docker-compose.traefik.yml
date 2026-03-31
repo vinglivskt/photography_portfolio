@@ -1,0 +1,39 @@
+services:
+  traefik:
+    image: traefik:v3.2
+    restart: unless-stopped
+    networks:
+      - app-network
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?укажите ACME_EMAIL в .env}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --api.dashboard=false
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+
+  nginx:
+    ports: []
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.portfolio.loadbalancer.server.port=80
+      - traefik.http.routers.portfolio-http.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.portfolio-http.entrypoints=web
+      - traefik.http.routers.portfolio-http.middlewares=portfolio-redirect-https
+      - traefik.http.middlewares.portfolio-redirect-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.portfolio-redirect-https.redirectscheme.permanent=true
+      - traefik.http.routers.portfolio.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.portfolio.entrypoints=websecure
+      - traefik.http.routers.portfolio.tls=true
+      - traefik.http.routers.portfolio.tls.certresolver=le
+
+volumes:
+  traefik_letsencrypt:

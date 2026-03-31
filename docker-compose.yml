@@ -1,0 +1,98 @@
+services:
+  db:
+    image: postgres:16-alpine
+    networks:
+      - app-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:5.4.0
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["dev"]
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    networks:
+      - app-network
+    environment:
+      - TZ=Europe/Moscow
+      - ADMINER_DESIGN=pepa-linha-dark
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    networks:
+      - app-network
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/app/data/uploads}
+      LEGACY_MEDIA_IMPORT_DIR: ${LEGACY_MEDIA_IMPORT_DIR:-/legacy_media}
+      STATIC_SEED_IMAGES_DIR: ${STATIC_SEED_IMAGES_DIR:-/theme_static/images}
+      FORCE_LEGACY_MEDIA_REIMPORT: ${FORCE_LEGACY_MEDIA_REIMPORT:-false}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_USE_TLS: ${SMTP_USE_TLS:-true}
+      FEEDBACK_FROM_EMAIL: ${FEEDBACK_FROM_EMAIL}
+      FEEDBACK_TO_EMAIL: ${FEEDBACK_TO_EMAIL}
+    volumes:
+      - api_uploads:/app/data/uploads
+      - ${LEGACY_MEDIA_BIND:-./legacy_media}:/legacy_media:ro
+      - ${THEME_STATIC_BIND:-./theme/static/images}:/theme_static/images:ro
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 8s
+      retries: 8
+      start_period: 45s
+
+  nginx:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    networks:
+      - app-network
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  api_uploads:

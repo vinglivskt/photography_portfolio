@@ -1,0 +1,23 @@
+/** Ответ GET /api/settings для тестов (все поля как в API). */
+export const mockSettingsResponse = {
+  photographer_name: "Тест Фотограф",
+  page_title: "Тестовое портфолио",
+  tagline: "Фотограф\nПодзаголовок",
+  bio: "Краткое описание для тестов.",
+  signature: "Подпись",
+  about_image: "",
+  hero_image_1: "",
+  hero_image_2: "",
+  vk_url: "",
+  telegram_url: "",
+  instagram_url: "",
+  phone: "",
+  email_public: "",
+  address: "",
+  website_url: "",
+  counter_equipment: 10,
+  counter_studio: 20,
+  counter_sessions: 30,
+  counter_clients: 40,
+  instagram_section_title: "Лента",
+};
