@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     force_legacy_media_reimport: bool = False
 
     smtp_host: str = ""
-    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_port: int | None = Field(default=587, ge=1, le=65535)
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_use_tls: bool = True
@@ -48,4 +48,7 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """Возвращает кешированный экземпляр настроек."""
-    return Settings()
+    settings = Settings()
+    if settings.smtp_port in ("", None):
+        settings.smtp_port = 587
+    return settings
