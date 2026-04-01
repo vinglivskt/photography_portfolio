@@ -221,7 +221,7 @@ Backend:
 ### 2. Запустите проект
 
 ```/dev/null/commands.sh#L1-1
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.http.yml up -d --build
 ```
 
 ### 3. Проверьте запуск

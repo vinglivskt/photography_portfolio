@@ -21,7 +21,6 @@ services:
       - traefik_letsencrypt:/letsencrypt
 
   nginx:
-    ports: []
     labels:
       - traefik.enable=true
       - traefik.http.services.portfolio.loadbalancer.server.port=80

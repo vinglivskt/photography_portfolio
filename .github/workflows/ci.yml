@@ -51,4 +51,5 @@ jobs:
           TRAEFIK_DOMAIN: localhost
         run: |
           docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.yml -f docker-compose.http.yml config --quiet
           docker compose -f docker-compose.yml -f docker-compose.traefik.yml config --quiet

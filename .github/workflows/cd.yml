@@ -73,13 +73,13 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             set -e
             cd ${{ secrets.SERVER_PATH }}
-            docker compose config --quiet
-            docker compose pull
-            if ! docker compose up -d --build; then
-              docker compose ps
-              docker compose logs --no-color db api nginx || true
+            docker compose -f docker-compose.yml -f docker-compose.http.yml config --quiet
+            docker compose -f docker-compose.yml -f docker-compose.http.yml pull
+            if ! docker compose -f docker-compose.yml -f docker-compose.http.yml up -d --build; then
+              docker compose -f docker-compose.yml -f docker-compose.http.yml ps
+              docker compose -f docker-compose.yml -f docker-compose.http.yml logs --no-color db api nginx || true
               exit 1
             fi
-            docker compose ps
+            docker compose -f docker-compose.yml -f docker-compose.http.yml ps
             docker image prune -f
           "
