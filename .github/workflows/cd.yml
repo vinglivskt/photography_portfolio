@@ -20,6 +20,7 @@ jobs:
 
       - name: Start ssh-agent
         uses: webfactory/ssh-agent@v0.9.0
+        # Note: The ssh-agent action will automatically add the provided SSH key to the agent and set up the necessary environment variables for subsequent steps to use SSH.
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
