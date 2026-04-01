@@ -10,7 +10,7 @@ from app.routers import blog, collections, feedback, health, services
 from app.routers import settings as settings_router
 from app.config import get_settings
 from app.legacy_import import import_legacy_portfolio_if_configured, import_theme_seed_if_configured
-from app.seed import seed_if_empty
+from app.seed import patch_degenerate_site_settings, seed_if_empty
 
 
 @asynccontextmanager
@@ -18,8 +18,10 @@ async def lifespan(app: FastAPI):
     """Сид и импорты при старте (схема — только через Alembic)."""
     async with AsyncSessionLocal() as session:
         await seed_if_empty(session)
+        await patch_degenerate_site_settings(session)
         await import_legacy_portfolio_if_configured(session, get_settings())
         await import_theme_seed_if_configured(session, get_settings())
+        await seed_if_empty(session)
     yield
 
 

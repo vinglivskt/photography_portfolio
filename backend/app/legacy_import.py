@@ -192,10 +192,32 @@ async def import_legacy_portfolio_if_configured(
     await session.commit()
 
 
+def _fill_hero_about_from_paths(
+    row: SiteSettings,
+    paths: list[str],
+    *,
+    fill_author_thumbs: bool,
+    author_thumbs_max: int | None = None,
+) -> None:
+    """Подставляет hero/about из списка относительных путей медиа (если поля пустые)."""
+    if not paths:
+        return
+    first, second = paths[0], paths[1] if len(paths) > 1 else paths[0]
+    if not (row.hero_image_1 or "").strip() or _is_theme_static(row.hero_image_1):
+        row.hero_image_1 = first
+    if not (row.hero_image_2 or "").strip() or _is_theme_static(row.hero_image_2):
+        row.hero_image_2 = second
+    if not (row.about_image or "").strip() or _is_theme_static(row.about_image):
+        row.about_image = first
+    if fill_author_thumbs and not row.author_image_paths:
+        cap = author_thumbs_max if author_thumbs_max is not None else len(paths)
+        row.author_image_paths = list(paths[:cap])
+
+
 async def import_theme_seed_if_configured(
     session: AsyncSession, settings: Settings
 ) -> None:
-    """Сидирует БД изображениями темы при пустой коллекции и блоге."""
+    """Демо из STATIC_SEED_IMAGES_DIR: коллекция/блог при пустых таблицах, hero и портрет всегда при необходимости."""
     root_s = (settings.static_seed_images_dir or "").strip()
     if not root_s:
         return
@@ -207,25 +229,20 @@ async def import_theme_seed_if_configured(
 
     author_dir = root / "autor"
     photo_dir = root / "photo"
-    if not author_dir.is_dir() or not photo_dir.is_dir():
-        logger.warning(
-            "Ожидаются папки autor и photo в %s (author=%s, photo=%s)",
-            root,
-            author_dir.is_dir(),
-            photo_dir.is_dir(),
-        )
+    has_author = author_dir.is_dir()
+    has_photo = photo_dir.is_dir()
+    if not has_author and not has_photo:
+        logger.warning("В %s нет папок autor и photo", root)
         return
 
-    author_files = _theme_seed_files(author_dir)
-    photo_files = _theme_seed_files(photo_dir)
+    author_files = _theme_seed_files(author_dir) if has_author else []
+    photo_files = _theme_seed_files(photo_dir) if has_photo else []
     if not author_files and not photo_files:
-        logger.info("В %s/autor и %s/photo нет изображений для демо-сида", root, root)
+        logger.info("В %s/autor и %s/photo нет файлов изображений", root, root)
         return
 
     n_coll = await session.scalar(select(func.count()).select_from(CollectionItem)) or 0
     n_blog = await session.scalar(select(func.count()).select_from(BlogPost)) or 0
-    if n_coll > 0 and n_blog > 0:
-        return
 
     upload_dir = Path(settings.upload_dir)
     upload_dir.mkdir(parents=True, exist_ok=True)
@@ -270,16 +287,14 @@ async def import_theme_seed_if_configured(
         session.add(row)
 
     if author_rel_paths:
-        first = author_rel_paths[0]
-        second = author_rel_paths[1] if len(author_rel_paths) > 1 else author_rel_paths[0]
-        if not (row.hero_image_1 or "").strip() or _is_theme_static(row.hero_image_1):
-            row.hero_image_1 = first
-        if not (row.hero_image_2 or "").strip() or _is_theme_static(row.hero_image_2):
-            row.hero_image_2 = second
-        if not (row.about_image or "").strip() or _is_theme_static(row.about_image):
-            row.about_image = first
-        if not row.author_image_paths:
-            row.author_image_paths = list(author_rel_paths)
+        _fill_hero_about_from_paths(row, author_rel_paths, fill_author_thumbs=True)
+    elif photo_rel_paths:
+        _fill_hero_about_from_paths(
+            row,
+            photo_rel_paths,
+            fill_author_thumbs=True,
+            author_thumbs_max=4,
+        )
 
     if not (row.public_short_name or "").strip():
         row.public_short_name = "Влад"

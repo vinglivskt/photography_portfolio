@@ -94,3 +94,47 @@ async def seed_if_empty(db: AsyncSession) -> None:
             ]
         )
         await db.commit()
+
+
+async def patch_degenerate_site_settings(db: AsyncSession) -> None:
+    """
+    Строка настроек без имени, био и с нулевыми счётчиками — подставляем демо-тексты
+    (часто после сбоя деплоя, когда сид не создал полноценную запись).
+    """
+    result = await db.execute(select(SiteSettings).order_by(SiteSettings.id).limit(1))
+    row = result.scalar_one_or_none()
+    if row is None:
+        return
+    if (row.photographer_name or "").strip():
+        return
+    if (row.bio or "").strip():
+        return
+    if any(
+        (
+            row.counter_equipment,
+            row.counter_studio,
+            row.counter_sessions,
+            row.counter_clients,
+        )
+    ):
+        return
+    row.photographer_name = "Владислав Женилов"
+    row.public_short_name = "Влад"
+    row.page_title = "Zhenilov — портфолио"
+    row.tagline = "Свет и настроение в кадре\nПортреты, пары, события"
+    row.hero_subtitle = "Портреты, пары, события"
+    row.bio = (
+        "Снимаю портреты, love story, мероприятия и коммерческие проекты. "
+        "Работаю с естественным светом и в студии, помогаю с позированием и настроением кадра."
+    )
+    row.signature = "Влад"
+    row.counter_equipment = 120
+    row.counter_studio = 150
+    row.counter_sessions = 200
+    row.counter_clients = 200
+    row.instagram_section_title = "Последние съёмки"
+    if not (row.vk_url or "").strip():
+        row.vk_url = VK_PUBLIC
+    if not (row.telegram_url or "").strip():
+        row.telegram_url = TELEGRAM_BOOKING
+    await db.commit()
