@@ -64,7 +64,6 @@ jobs:
           FEEDBACK_TO_EMAIL=${{ secrets.FEEDBACK_TO_EMAIL }}
           TRAEFIK_DOMAIN=${{ secrets.TRAEFIK_DOMAIN }}
           ACME_EMAIL=${{ secrets.ACME_EMAIL }}
-          TRAEFIK_ADMINER_HOST=${{ secrets.TRAEFIK_ADMINER_HOST }}
           ADMINER_BASIC_AUTH_USERS=${{ secrets.ADMINER_BASIC_AUTH_USERS }}
           ADMINER_PORT=${{ secrets.ADMINER_PORT }}
           FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}

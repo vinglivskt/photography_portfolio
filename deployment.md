@@ -20,6 +20,6 @@ API не публикуется на хост — доступ снаружи т
 
 В репозитории включён GitHub Actions (`.github/workflows/ci.yml`): pytest, Vitest, проверка `docker compose config`.
 
-Workflow **CD** (`.github/workflows/cd.yml`): rsync на сервер, запись `.env` из GitHub Secrets, затем `docker compose` с **`docker-compose.yml` + `docker-compose.traefik.yml`** (как при ручном деплое с HTTPS). Обязательные секреты для Traefik: **`TRAEFIK_ADMINER_HOST`**, **`ADMINER_BASIC_AUTH_USERS`** (строка htpasswd с удвоенными `$` для Docker — см. `env.example`). Строка `.env` собирается через heredoc, чтобы `$` в паролях и в Basic Auth не ломались на runner.
+Workflow **CD** (`.github/workflows/cd.yml`): rsync на сервер, запись `.env` из GitHub Secrets, затем `docker compose` с **`docker-compose.yml` + `docker-compose.traefik.yml`**. Для Adminer по HTTPS нужны **`ADMINER_BASIC_AUTH_USERS`** (htpasswd, `$` удвоены) и в DNS — **`adminer.<TRAEFIK_DOMAIN>`** (A на IP сервера). Строка `.env` через heredoc, чтобы `$` не ломались на runner.
 
 После смены `POSTGRES_PASSWORD` на уже заполненном volume пароль в контейнере PostgreSQL не обновится — меняйте пароль вручную в БД или пересоздайте volume (данные пропадут).
