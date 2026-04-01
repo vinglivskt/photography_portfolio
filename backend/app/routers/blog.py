@@ -1,13 +1,13 @@
 import math
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.media_utils import public_media_url
 from app.models import BlogPost
-from app.schemas import BlogPostOut, PaginatedBlog
+from app.schemas import BlogPostDetailOut, BlogPostListItem, PaginatedBlog
 
 router = APIRouter(prefix="/blog", tags=["blog"])
 
@@ -31,7 +31,7 @@ async def list_blog(
     )
     rows = result.scalars().all()
     items = [
-        BlogPostOut(
+        BlogPostListItem(
             id=r.id,
             title=r.title,
             description=r.description,
@@ -45,3 +45,24 @@ async def list_blog(
     return PaginatedBlog(
         items=items, total=total, page=page, per_page=per_page, pages=pages
     )
+
+
+@router.get("/{post_id}", response_model=BlogPostDetailOut)
+async def read_blog_post(
+    post_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> BlogPostDetailOut:
+    """Одна публикация с полным текстом."""
+    r = await db.get(BlogPost, post_id)
+    if r is None:
+        raise HTTPException(status_code=404, detail="not found")
+    base = BlogPostListItem(
+        id=r.id,
+        title=r.title,
+        description=r.description,
+        image_url=public_media_url(r.image_path),
+        external_url=r.external_url or "",
+        published_at=r.published_at,
+        sort_order=r.sort_order,
+    )
+    return BlogPostDetailOut(**base.model_dump(), body=r.body or "")

@@ -26,6 +26,9 @@ class SiteSettingsOut(BaseModel):
     counter_sessions: int
     counter_clients: int
     instagram_section_title: str
+    public_short_name: str
+    hero_subtitle: str
+    author_images: list[str]
 
     model_config = {"from_attributes": True}
 
@@ -42,8 +45,8 @@ class CollectionOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class BlogPostOut(BaseModel):
-    """Схема одной записи блога."""
+class BlogPostListItem(BaseModel):
+    """Краткая схема записи блога (список без полного текста)."""
     id: int
     title: str
     description: str
@@ -55,12 +58,18 @@ class BlogPostOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class BlogPostDetailOut(BlogPostListItem):
+    """Полная запись блога для страницы истории."""
+    body: str
+
+
 class ServiceOut(BaseModel):
     """Схема одной услуги."""
     id: int
     title: str
     description: str
     icon_class: str
+    booking_url: str
     sort_order: int
 
     model_config = {"from_attributes": True}
@@ -77,7 +86,7 @@ class PaginatedCollections(BaseModel):
 
 class PaginatedBlog(BaseModel):
     """Ответ API со страницей блога."""
-    items: List[BlogPostOut]
+    items: List[BlogPostListItem]
     total: int
     page: int
     per_page: int

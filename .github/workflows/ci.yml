@@ -9,6 +9,20 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: portfolio_test
+          POSTGRES_PASSWORD: portfolio_test
+          POSTGRES_DB: portfolio_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U portfolio_test -d portfolio_test"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
     defaults:
       run:
         working-directory: backend
@@ -21,7 +35,7 @@ jobs:
         run: uv sync --frozen --all-groups
       - name: Pytest
         env:
-          PYTEST_RUNNING: "1"
+          PYTEST_DATABASE_URL: postgresql+asyncpg://portfolio_test:portfolio_test@127.0.0.1:5432/portfolio_test
         run: uv run pytest -q
 
   frontend:

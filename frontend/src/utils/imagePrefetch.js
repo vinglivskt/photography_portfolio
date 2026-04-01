@@ -26,3 +26,10 @@ export function prefetchBlogPage(page, perPage = 6) {
     prefetchImageUrls(blogImageUrlsFromResponse(res));
   });
 }
+
+export function prefetchBlogPost(id) {
+  if (!id) return;
+  prefetchJson(`/api/blog/${id}`).then((res) => {
+    if (res?.image_url) prefetchImageUrls([res.image_url]);
+  });
+}

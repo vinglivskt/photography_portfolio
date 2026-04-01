@@ -1,49 +1,11 @@
 import { useEffect, useState } from "react";
 import { fetchJson } from "../api/client.js";
 import PageHeader from "../components/PageHeader.jsx";
+import { useSiteSettings } from "../context/SettingsContext.jsx";
 
-/** Демо-набор услуг, если API пока не заполнено. */
-const STATIC_SERVICES = [
-  {
-    id: "static-1",
-    title: "Индивидуальная съемка",
-    description: "Портретная съемка в студии или на локации.",
-    icon_class: "flaticon-big-lens",
-  },
-  {
-    id: "static-2",
-    title: "Парная съемка",
-    description: "Love story и семейные кадры с живой подачей.",
-    icon_class: "flaticon-printing-photo",
-  },
-  {
-    id: "static-3",
-    title: "Репортаж",
-    description: "События, праздники, концерты и рабочие процессы.",
-    icon_class: "flaticon-focusing-target",
-  },
-  {
-    id: "static-4",
-    title: "Контент для бренда",
-    description: "Съемка для соцсетей, сайта и рекламных материалов.",
-    icon_class: "flaticon-camera",
-  },
-  {
-    id: "static-5",
-    title: "Ретушь и цвет",
-    description: "Базовая обработка всех кадров и аккуратная ретушь.",
-    icon_class: "flaticon-polaroid-pictures",
-  },
-  {
-    id: "static-6",
-    title: "Подготовка к съемке",
-    description: "Помощь с образом, референсами и таймингом.",
-    icon_class: "flaticon-film",
-  },
-];
-
-/** Страница списка услуг с приоритетом данных из API. */
+/** Услуги из API; переход на запись — ссылка из БД (booking_url или telegram). */
 export default function Services() {
+  const s = useSiteSettings();
   const [items, setItems] = useState(null);
 
   useEffect(() => {
@@ -60,32 +22,47 @@ export default function Services() {
     };
   }, []);
 
-  const display = items != null && items.length > 0 ? items : STATIC_SERVICES;
-  const fromApi = items != null && items.length > 0;
+  const fallbackTelegram = (s.telegram_url || "").trim();
 
   return (
     <>
-      <PageHeader
-        title="Форматы съемки"
-        subtitle="Что можно снять и как проходит работа"
-      />
+      <PageHeader title="Форматы съемки" subtitle="Что можно снять и как проходит работа" />
       <section className="portfolio-section">
         <div className="portfolio-container">
           {items === null ? <p className="portfolio-loading-note">Загрузка услуг…</p> : null}
-          <div className={`portfolio-service-grid${items === null ? " portfolio-service-grid--hidden" : ""}`}>
-            {display.map((it) => (
-              <article key={it.id} className="portfolio-service-card">
-                <div className="portfolio-service-icon">
-                  <span className={it.icon_class || "flaticon-camera"} aria-hidden="true" />
-                </div>
-                <h3>{it.title}</h3>
-                <p>{it.description}</p>
-              </article>
-            ))}
-          </div>
-          {!fromApi && items != null ? (
-            <p className="portfolio-muted-note">Сейчас показан базовый набор форматов</p>
+          {items !== null && items.length === 0 ? (
+            <p className="portfolio-empty-hint">Список услуг пуст — добавьте записи в таблицу услуг.</p>
           ) : null}
+          <div className={`portfolio-service-grid${items === null ? " portfolio-service-grid--hidden" : ""}`}>
+            {(items || []).map((it) => {
+              const href = ((it.booking_url || "").trim() || fallbackTelegram).trim();
+              const inner = (
+                <>
+                  <div className="portfolio-service-icon">
+                    <span className={it.icon_class || "flaticon-camera"} aria-hidden="true" />
+                  </div>
+                  <h3>{it.title}</h3>
+                  <p>{it.description}</p>
+                  {href ? <span className="portfolio-service-cta">Записаться в Telegram →</span> : null}
+                </>
+              );
+              return href ? (
+                <a
+                  key={it.id}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="portfolio-service-card portfolio-service-card--link"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <article key={it.id} className="portfolio-service-card">
+                  {inner}
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
     </>

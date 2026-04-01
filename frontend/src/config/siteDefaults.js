@@ -1,13 +1,15 @@
 /**
- * Текстовые дефолты, если в API пустые строки. Картинки — в themeImages.js и фолбэках страниц.
+ * Минимальные дефолты до ответа API (только если поле в API пустое).
+ * Весь контент сайта задаётся в БД.
  */
 export const SITE_DEFAULTS = {
-  photographer_name: "Фотограф",
-  page_title: "Портфолио фотографа",
-  tagline: "Фотограф\nПортреты, пары, события",
-  bio:
-    "Снимаю портреты, пары и события. Помогаю с позированием и делаю естественную обработку без перегруза.",
-  signature: "Фотограф",
+  photographer_name: "",
+  public_short_name: "",
+  page_title: "",
+  tagline: "",
+  hero_subtitle: "",
+  bio: "",
+  signature: "",
   about_image: "",
   hero_image_1: "",
   hero_image_2: "",
@@ -18,11 +20,12 @@ export const SITE_DEFAULTS = {
   email_public: "",
   address: "",
   website_url: "",
-  counter_equipment: 120,
-  counter_studio: 150,
-  counter_sessions: 200,
-  counter_clients: 200,
-  instagram_section_title: "Избранные работы",
+  counter_equipment: 0,
+  counter_studio: 0,
+  counter_sessions: 0,
+  counter_clients: 0,
+  instagram_section_title: "",
+  author_images: [],
 };
 
 /**
@@ -32,6 +35,12 @@ export function mergeSiteSettings(api) {
   if (!api) return { ...SITE_DEFAULTS };
   const out = { ...SITE_DEFAULTS };
   for (const key of Object.keys(SITE_DEFAULTS)) {
+    if (key === "author_images") {
+      if (Array.isArray(api.author_images) && api.author_images.length > 0) {
+        out.author_images = api.author_images.filter(Boolean);
+      }
+      continue;
+    }
     const v = api[key];
     if (key.startsWith("counter_")) {
       if (typeof v === "number" && !Number.isNaN(v)) out[key] = v;

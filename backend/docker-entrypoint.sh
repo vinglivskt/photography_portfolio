@@ -7,6 +7,8 @@ if [ "$(id -u)" = 0 ]; then
   if [ ! -f "$UPLOAD/placeholders/collection-1.svg" ]; then
     gosu app sh -c "cp /app/builtin/placeholders/*.svg \"$UPLOAD/placeholders/\"" 2>/dev/null || true
   fi
+  gosu app sh -c "cd /app && alembic upgrade head"
   exec gosu app "$@"
 fi
+cd /app && alembic upgrade head
 exec "$@"

@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { routeTitleForPath } from "../config/routes.js";
 import { useSiteSettings } from "../context/SettingsContext.jsx";
-import { prefetchImageUrls } from "../api/client.js";
-import { ABOUT_GALLERY_STRIP, ABOUT_PORTRAIT_FALLBACK } from "../config/themeImages.js";
-import { prefetchBlogPage, prefetchCollectionPage } from "../utils/imagePrefetch.js";
+import { prefetchImageUrls, prefetchJson } from "../api/client.js";
+import { collectionImageUrlsFromResponse, prefetchBlogPage, prefetchCollectionPage } from "../utils/imagePrefetch.js";
 
 const THEME_KEY = "portfolio-theme";
 const ROUTE_PREFETCHERS = {
@@ -51,7 +50,11 @@ function prefetchRouteGallery(path) {
   if (networkType.includes("2g")) return;
   if (path === "/collection") prefetchCollectionPage(1);
   if (path === "/blog") prefetchBlogPage(1);
-  if (path === "/about") prefetchImageUrls([ABOUT_PORTRAIT_FALLBACK, ...ABOUT_GALLERY_STRIP]);
+  if (path === "/about") {
+    prefetchJson("/api/collections?page=1&per_page=3").then((res) => {
+      prefetchImageUrls(collectionImageUrlsFromResponse(res));
+    });
+  }
 }
 
 function prefetchRoute(path) {
@@ -142,7 +145,9 @@ export default function Layout() {
         <div className="portfolio-container portfolio-header-inner">
           <NavLink to="/" className="portfolio-brand" aria-label="На главную">
             <span className="portfolio-brand-name">{s.photographer_name}</span>
-            <span className="portfolio-brand-tagline">{(s.tagline || "Фотограф").split("\n")[0]}</span>
+            <span className="portfolio-brand-tagline">
+              {((s.tagline || "").split("\n")[0] || "").trim() || "\u00a0"}
+            </span>
           </NavLink>
           <div className="portfolio-header-controls">
             <button

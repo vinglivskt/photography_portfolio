@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.database import AsyncSessionLocal, Base, engine
+from app.database import AsyncSessionLocal
 from app.routers import blog, collections, feedback, health, services
 from app.routers import settings as settings_router
 from app.config import get_settings
@@ -15,9 +15,7 @@ from app.seed import seed_if_empty
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Инициализирует БД и выполняет первичный сид при старте API."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Сид и импорты при старте (схема — только через Alembic)."""
     async with AsyncSessionLocal() as session:
         await seed_if_empty(session)
         await import_legacy_portfolio_if_configured(session, get_settings())

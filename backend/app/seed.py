@@ -5,6 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ServiceItem, SiteSettings
 
+TELEGRAM_BOOKING = "https://t.me/mynightisall"
+VK_PUBLIC = "https://vk.com/id183709684"
+
 
 async def seed_if_empty(db: AsyncSession) -> None:
     """Создает стартовые записи настроек и услуг, если таблицы пусты."""
@@ -12,19 +15,21 @@ async def seed_if_empty(db: AsyncSession) -> None:
     if n_settings == 0:
         db.add(
             SiteSettings(
-                photographer_name="Фотограф",
-                page_title="Портфолио фотографа",
-                tagline="Фотограф\nСнимаю портреты, истории и события",
+                photographer_name="Владислав Женилов",
+                public_short_name="Влад",
+                page_title="Zhenilov — портфолио",
+                tagline="Свет и настроение в кадре\nПортреты, пары, события",
+                hero_subtitle="Портреты, пары, события",
                 bio=(
                     "Снимаю портреты, love story, мероприятия и коммерческие проекты. "
                     "Работаю с естественным светом и в студии, помогаю с позированием и настроением кадра."
                 ),
-                signature="Фотограф",
+                signature="Влад",
                 about_image="",
                 hero_image_1="",
                 hero_image_2="",
-                vk_url="",
-                telegram_url="",
+                vk_url=VK_PUBLIC,
+                telegram_url=TELEGRAM_BOOKING,
                 instagram_url="",
                 phone="",
                 email_public="",
@@ -34,7 +39,8 @@ async def seed_if_empty(db: AsyncSession) -> None:
                 counter_studio=150,
                 counter_sessions=200,
                 counter_clients=200,
-                instagram_section_title="Follow me on Instagram",
+                instagram_section_title="Последние съёмки",
+                author_image_paths=[],
             )
         )
         await db.commit()
@@ -47,36 +53,42 @@ async def seed_if_empty(db: AsyncSession) -> None:
                     title="Портретная съемка",
                     description="Индивидуальные и семейные портреты, подбор локации и света.",
                     icon_class="flaticon-big-lens",
+                    booking_url=TELEGRAM_BOOKING,
                     sort_order=10,
                 ),
                 ServiceItem(
                     title="Печать и ретушь",
                     description="Обработка снимков, подготовка к печати и альбомам.",
                     icon_class="flaticon-printing-photo",
+                    booking_url=TELEGRAM_BOOKING,
                     sort_order=20,
                 ),
                 ServiceItem(
                     title="Коммерция",
                     description="Предметная съемка, контент для брендов и соцсетей.",
                     icon_class="flaticon-focusing-target",
+                    booking_url=TELEGRAM_BOOKING,
                     sort_order=30,
                 ),
                 ServiceItem(
                     title="Студия",
                     description="Съемка в студии с реквизитом и светом.",
                     icon_class="flaticon-camera",
+                    booking_url=TELEGRAM_BOOKING,
                     sort_order=40,
                 ),
                 ServiceItem(
                     title="Love story",
                     description="Прогулочные и постановочные истории для пар.",
                     icon_class="flaticon-polaroid-pictures",
+                    booking_url=TELEGRAM_BOOKING,
                     sort_order=50,
                 ),
                 ServiceItem(
                     title="Мероприятия",
                     description="Корпоративы, концерты, отчетная съемка.",
                     icon_class="flaticon-film",
+                    booking_url=TELEGRAM_BOOKING,
                     sort_order=60,
                 ),
             ]

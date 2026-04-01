@@ -1,15 +1,17 @@
 /** Ответ GET /api/settings для тестов (все поля как в API). */
 export const mockSettingsResponse = {
   photographer_name: "Тест Фотограф",
+  public_short_name: "Тест",
   page_title: "Тестовое портфолио",
-  tagline: "Фотограф\nПодзаголовок",
+  tagline: "Строка один\nСтрока два",
+  hero_subtitle: "",
   bio: "Краткое описание для тестов.",
   signature: "Подпись",
   about_image: "",
   hero_image_1: "",
   hero_image_2: "",
-  vk_url: "",
-  telegram_url: "",
+  vk_url: "https://vk.com/test",
+  telegram_url: "https://t.me/test",
   instagram_url: "",
   phone: "",
   email_public: "",
@@ -20,4 +22,5 @@ export const mockSettingsResponse = {
   counter_sessions: 30,
   counter_clients: 40,
   instagram_section_title: "Лента",
+  author_images: [],
 };

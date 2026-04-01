@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.models import BlogPost, CollectionItem, SiteSettings
+from app.seed import TELEGRAM_BOOKING, VK_PUBLIC
 
 logger = logging.getLogger(__name__)
 
@@ -244,11 +245,17 @@ async def import_theme_seed_if_configured(
         logger.info("Theme seed: коллекция заполнена из photo (%s)", len(photo_rel_paths))
 
     if n_blog == 0 and photo_rel_paths:
+        bodies = [
+            "Подготовка к съёмке: свет, локация и настроение. Этот кадр собирали без спешки, чтобы в кадре осталась естественная история.",
+            "На площадке важно не торопить героя: даём привыкнуть к объективу и ловим живые жесты без шаблонных поз.",
+            "После съёмки — отбор и аккуратная обработка: цвет и свет усиливают кадр, не перетягивая на себя внимание.",
+        ]
         for j in range(min(3, len(photo_rel_paths))):
             session.add(
                 BlogPost(
                     title=f"История кадра {j + 1}",
-                    description="Демо-запись из папки photo.",
+                    description="Коротко о дне съёмки и настроении кадра.",
+                    body=bodies[j % len(bodies)],
                     image_path=photo_rel_paths[j],
                     published_at=date.today() - timedelta(days=j),
                     sort_order=j + 1,
@@ -271,6 +278,15 @@ async def import_theme_seed_if_configured(
             row.hero_image_2 = second
         if not (row.about_image or "").strip() or _is_theme_static(row.about_image):
             row.about_image = first
+        if not row.author_image_paths:
+            row.author_image_paths = list(author_rel_paths)
+
+    if not (row.public_short_name or "").strip():
+        row.public_short_name = "Влад"
+    if not (row.vk_url or "").strip():
+        row.vk_url = VK_PUBLIC
+    if not (row.telegram_url or "").strip():
+        row.telegram_url = TELEGRAM_BOOKING
 
     await session.commit()
 

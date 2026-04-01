@@ -3,9 +3,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.media_utils import public_media_url
 from app.models import SiteSettings
 from app.schemas import SiteSettingsOut
+from app.settings_serialize import site_settings_to_out
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -26,11 +26,4 @@ async def _get_row(db: AsyncSession) -> SiteSettings:
 async def read_settings(db: AsyncSession = Depends(get_db)) -> SiteSettingsOut:
     """Отдает настройки сайта с нормализованными URL изображений."""
     row = await _get_row(db)
-    base = SiteSettingsOut.model_validate(row)
-    return base.model_copy(
-        update={
-            "about_image": public_media_url(row.about_image),
-            "hero_image_1": public_media_url(row.hero_image_1),
-            "hero_image_2": public_media_url(row.hero_image_2),
-        }
-    )
+    return site_settings_to_out(row)

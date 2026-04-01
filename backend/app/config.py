@@ -38,10 +38,10 @@ class Settings(BaseSettings):
 
     @property
     def database_url_sync(self) -> str:
-        """Преобразует asyncpg URL в psycopg2 URL для sync-инструментов."""
+        """Преобразует asyncpg URL в sync для Alembic (драйвер psycopg3)."""
         url = self.database_url
         if "+asyncpg" in url:
-            return url.replace("+asyncpg", "+psycopg2", 1)
+            return url.replace("postgresql+asyncpg://", "postgresql+psycopg://", 1)
         return url
 
 

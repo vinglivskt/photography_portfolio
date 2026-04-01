@@ -1,28 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ABOUT_PORTRAIT_FALLBACK,
-  ABOUT_GALLERY_STRIP,
-  GALLERY_LEN,
-  THEME_IMAGES,
-} from "../config/themeImages.js";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
 import { useSiteSettings } from "../context/SettingsContext.jsx";
 import { fetchJson, prefetchImageUrls } from "../api/client.js";
 import Lightbox from "../components/Lightbox.jsx";
 
-const ABOUT_STRIP_COUNT = 5;
+const PORTFOLIO_PREVIEW = 3;
 
-/** Страница с профилем фотографа, счетчиками и галереей. */
+/** «Обо мне»: портрет из настроек, 3 кадра из портфолио (API). */
 export default function About() {
   const s = useSiteSettings();
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [collectionStrip, setCollectionStrip] = useState(null);
-  const portrait = (s.about_image && s.about_image.trim()) || ABOUT_PORTRAIT_FALLBACK;
+
+  const portrait = (s.about_image || "").trim();
 
   useEffect(() => {
     let cancelled = false;
-    fetchJson(`/api/collections?page=1&per_page=${ABOUT_STRIP_COUNT}`)
+    fetchJson(`/api/collections?page=1&per_page=${PORTFOLIO_PREVIEW}`)
       .then((res) => {
         if (!cancelled) setCollectionStrip(Array.isArray(res?.items) ? res.items : []);
       })
@@ -36,41 +31,24 @@ export default function About() {
 
   const stripRows = useMemo(() => {
     if (collectionStrip === null) return null;
-    if (!collectionStrip.length) {
-      return ABOUT_GALLERY_STRIP.map((url, i) => ({
-        key: `theme-${i}`,
-        src: url,
-        caption: `Кадр ${i + 1}`,
-      }));
-    }
-    return Array.from({ length: ABOUT_STRIP_COUNT }, (_, i) => {
+    const rows = [];
+    for (let i = 0; i < PORTFOLIO_PREVIEW; i++) {
       const c = collectionStrip[i];
-      if (c && c.image_url && !isPlaceholderAssetUrl(c.image_url)) {
-        return {
+      if (c?.image_url && !isPlaceholderAssetUrl(c.image_url)) {
+        rows.push({
           key: `api-${c.id}`,
           src: c.image_url,
           caption: c.title || `Кадр ${i + 1}`,
-        };
+        });
       }
-      if (c) {
-        return {
-          key: `api-${c.id}-ph`,
-          src: THEME_IMAGES.gallery[i % GALLERY_LEN],
-          caption: c.title || `Кадр ${i + 1}`,
-        };
-      }
-      return {
-        key: `fill-${i}`,
-        src: ABOUT_GALLERY_STRIP[i % ABOUT_GALLERY_STRIP.length],
-        caption: `Кадр ${i + 1}`,
-      };
-    });
+    }
+    return rows;
   }, [collectionStrip]);
 
   useEffect(() => {
-    const urls = [portrait];
+    const urls = [];
+    if (portrait) urls.push(portrait);
     if (stripRows?.length) urls.push(...stripRows.map((r) => r.src));
-    else urls.push(...ABOUT_GALLERY_STRIP);
     prefetchImageUrls(urls);
   }, [portrait, stripRows]);
 
@@ -83,7 +61,9 @@ export default function About() {
     ],
     [s.counter_clients, s.counter_equipment, s.counter_sessions, s.counter_studio]
   );
-  const lightboxItems = (stripRows || ABOUT_GALLERY_STRIP.map((url, i) => ({ src: url, caption: `Кадр ${i + 1}` }))).map((r) => ({
+
+  const displayName = (s.photographer_name || "").trim() || (s.public_short_name || "").trim() || "Обо мне";
+  const lightboxItems = (stripRows || []).map((r) => ({
     src: r.src,
     alt: r.caption,
     caption: r.caption,
@@ -94,12 +74,16 @@ export default function About() {
       <section className="portfolio-section">
         <div className="portfolio-container portfolio-about-grid">
           <div className="portfolio-about-photo">
-            <img src={portrait} alt={`Портрет ${s.photographer_name}`} loading="lazy" />
+            {portrait ? (
+              <img src={portrait} alt={`Портрет ${displayName}`} loading="lazy" />
+            ) : (
+              <div className="portfolio-about-photo-empty" role="img" aria-label="Фото из настроек сайта" />
+            )}
           </div>
           <article>
             <p className="portfolio-kicker">Обо мне</p>
-            <h1 className="portfolio-page-title">{s.photographer_name}</h1>
-            <p className="portfolio-lead">{s.bio}</p>
+            <h1 className="portfolio-page-title">{displayName}</h1>
+            {s.bio ? <p className="portfolio-lead">{s.bio}</p> : null}
             <div className="portfolio-stat-grid">
               {stats.map((it) => (
                 <div key={it.label} className="portfolio-stat">
@@ -109,34 +93,38 @@ export default function About() {
               ))}
             </div>
             <Link to="/contact" className="portfolio-btn portfolio-btn--primary">
-              Записаться на съемку
+              Связаться
             </Link>
           </article>
         </div>
       </section>
 
-      <section className="portfolio-section portfolio-section--alt" aria-label="Лента работ">
+      <section className="portfolio-section portfolio-section--alt" aria-label="Работы из портфолио">
         <div className="portfolio-container">
           <div className="portfolio-grid portfolio-grid--featured">
-            {stripRows === null
-              ? Array.from({ length: ABOUT_STRIP_COUNT }, (_, i) => (
-                  <div key={`about-strip-skel-${i}`} className="portfolio-shot portfolio-shot--skeleton" aria-hidden="true" />
-                ))
-              : stripRows.map((row, i) => (
-                  <button
-                    key={row.key}
-                    type="button"
-                    className="portfolio-shot portfolio-shot-btn"
-                    title={row.caption}
-                    onClick={() => setLightboxIndex(i)}
-                  >
-                    <img src={row.src} alt={row.caption} loading="lazy" />
-                  </button>
-                ))}
+            {stripRows === null ? (
+              Array.from({ length: PORTFOLIO_PREVIEW }, (_, i) => (
+                <div key={`about-strip-skel-${i}`} className="portfolio-shot portfolio-shot--skeleton" aria-hidden="true" />
+              ))
+            ) : stripRows.length > 0 ? (
+              stripRows.map((row, i) => (
+                <button
+                  key={row.key}
+                  type="button"
+                  className="portfolio-shot portfolio-shot-btn"
+                  title={row.caption}
+                  onClick={() => setLightboxIndex(i)}
+                >
+                  <img src={row.src} alt={row.caption} loading="lazy" />
+                </button>
+              ))
+            ) : (
+              <p className="portfolio-empty-hint">В коллекции пока нет кадров для блока «работы».</p>
+            )}
           </div>
         </div>
       </section>
-      {lightboxIndex >= 0 ? (
+      {lightboxIndex >= 0 && lightboxItems.length > 0 ? (
         <Lightbox
           items={lightboxItems}
           index={lightboxIndex}

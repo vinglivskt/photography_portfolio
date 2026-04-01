@@ -22,6 +22,7 @@ async def list_services(db: AsyncSession = Depends(get_db)):
             title=r.title,
             description=r.description,
             icon_class=r.icon_class,
+            booking_url=r.booking_url or "",
             sort_order=r.sort_order,
         )
         for r in rows

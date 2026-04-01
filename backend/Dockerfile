@@ -16,6 +16,8 @@ ENV UPLOAD_DIR=/app/data/uploads
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
+COPY alembic.ini ./
+COPY alembic ./alembic
 COPY app ./app
 COPY builtin ./builtin
 

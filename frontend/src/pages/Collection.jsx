@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
-import { COLLECTION_EMPTY_MOSAIC, GALLERY_LEN, THEME_IMAGES } from "../config/themeImages.js";
 import { fetchJson } from "../api/client.js";
 import { prefetchCollectionPage } from "../utils/imagePrefetch.js";
 import PageHeader from "../components/PageHeader.jsx";
 import PaginationBar from "../components/PaginationBar.jsx";
 import Lightbox from "../components/Lightbox.jsx";
 
-/** Страница портфолио с API-данными и fallback-мозаикой. */
+/** Портфолио только из API коллекции. */
 export default function Collection() {
   const [searchParams] = useSearchParams();
   const page = Math.max(1, Number(searchParams.get("page") || 1));
@@ -36,17 +35,15 @@ export default function Collection() {
   }, [data, page]);
 
   const rows = useMemo(() => {
-    if (!data?.items?.length) return { mode: "mosaic", list: COLLECTION_EMPTY_MOSAIC };
-    const allPlaceholders = data.items.every((c) => !c.image_url || isPlaceholderAssetUrl(c.image_url));
-    if (allPlaceholders) return { mode: "mosaic", list: COLLECTION_EMPTY_MOSAIC };
-    return {
-      mode: "api",
-      list: data.items.map((c, i) => {
-        const ph = !c.image_url || isPlaceholderAssetUrl(c.image_url);
-        const bg = ph ? THEME_IMAGES.gallery[i % GALLERY_LEN] : c.image_url;
-        return { ...c, displayUrl: bg };
-      }),
-    };
+    if (!data?.items?.length) return { mode: "empty", list: [] };
+    const list = data.items.map((c, i) => {
+      const ph = !c.image_url || isPlaceholderAssetUrl(c.image_url);
+      const bg = ph ? "" : c.image_url;
+      return { ...c, displayUrl: bg };
+    });
+    const hasDisplay = list.some((c) => c.displayUrl);
+    if (!hasDisplay) return { mode: "empty", list: [] };
+    return { mode: "api", list };
   }, [data]);
 
   const isStale = Boolean(data && data.page !== page);
@@ -55,47 +52,29 @@ export default function Collection() {
     return <PageHeader title="Портфолио" subtitle="Загрузка…" />;
   }
 
-  const empty = !data.items || data.items.length === 0;
   const galleryItems =
-    empty || rows.mode === "mosaic"
-      ? rows.list.map((url, i) => ({ src: url, alt: `Фотография ${i + 1}`, caption: `Кадр ${i + 1}` }))
-      : rows.list
-          .filter((c) => !c.external_url)
+    rows.mode === "api"
+      ? rows.list
+          .filter((c) => !c.external_url && c.displayUrl)
           .map((c) => ({
             src: c.displayUrl,
             alt: c.title || "Работа из портфолио",
             caption: c.title || "Работа из коллекции",
-          }));
+          }))
+      : [];
 
   return (
     <>
-      <PageHeader
-        title="Портфолио"
-        subtitle="Избранные работы"
-      />
+      <PageHeader title="Портфолио" subtitle="Избранные работы" />
       <section className={`portfolio-section${isStale ? " portfolio-section--pending" : ""}`} aria-busy={isStale}>
         <div className="portfolio-container">
-          {empty || rows.mode === "mosaic" ? (
-            <>
-              <div className="portfolio-grid portfolio-grid--gallery">
-                {rows.list.map((url, i) => (
-                  <button
-                    key={url}
-                    type="button"
-                    className="portfolio-shot portfolio-shot--gallery portfolio-shot-btn"
-                    title={`Кадр ${i + 1}`}
-                    onClick={() => setLightboxIndex(i)}
-                  >
-                    <img src={url} alt={`Фотография ${i + 1}`} loading="lazy" />
-                  </button>
-                ))}
-              </div>
-            </>
+          {rows.mode === "empty" ? (
+            <p className="portfolio-empty-hint">В коллекции пока нет работ — добавьте записи в базу.</p>
           ) : (
             <>
               <div className="portfolio-grid portfolio-grid--gallery">
                 {rows.list.map((c) =>
-                  c.external_url ? (
+                  c.external_url && c.displayUrl ? (
                     <a
                       key={c.id}
                       href={c.external_url}
@@ -110,7 +89,7 @@ export default function Collection() {
                         {c.description ? <small>{c.description}</small> : null}
                       </span>
                     </a>
-                  ) : (
+                  ) : c.displayUrl ? (
                     <button
                       key={c.id}
                       type="button"
@@ -126,6 +105,8 @@ export default function Collection() {
                         {c.description ? <small>{c.description}</small> : null}
                       </span>
                     </button>
+                  ) : (
+                    <div key={c.id} className="portfolio-shot portfolio-shot--skeleton" aria-hidden="true" />
                   )
                 )}
               </div>
@@ -141,7 +122,7 @@ export default function Collection() {
           )}
         </div>
       </section>
-      {lightboxIndex >= 0 ? (
+      {lightboxIndex >= 0 && galleryItems.length > 0 ? (
         <Lightbox
           items={galleryItems}
           index={lightboxIndex}

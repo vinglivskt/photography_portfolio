@@ -1,6 +1,6 @@
 from datetime import date, datetime, timezone
 
-from sqlalchemy import Date, DateTime, Integer, String, Text
+from sqlalchemy import Date, DateTime, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -36,6 +36,9 @@ class SiteSettings(Base):
     counter_sessions: Mapped[int] = mapped_column(Integer, default=0)
     counter_clients: Mapped[int] = mapped_column(Integer, default=0)
     instagram_section_title: Mapped[str] = mapped_column(String(200), default="")
+    public_short_name: Mapped[str] = mapped_column(String(200), default="")
+    hero_subtitle: Mapped[str] = mapped_column(String(500), default="")
+    author_image_paths: Mapped[list] = mapped_column(JSON, insert_default=list)
 
 
 class CollectionItem(Base):
@@ -58,6 +61,7 @@ class BlogPost(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(Text, default="")
+    body: Mapped[str] = mapped_column(Text, default="")
     image_path: Mapped[str] = mapped_column(String(500))
     external_url: Mapped[str] = mapped_column(String(500), default="")
     published_at: Mapped[date] = mapped_column(Date)
@@ -72,6 +76,7 @@ class ServiceItem(Base):
     title: Mapped[str] = mapped_column(String(200))
     description: Mapped[str] = mapped_column(Text, default="")
     icon_class: Mapped[str] = mapped_column(String(100), default="flaticon-camera")
+    booking_url: Mapped[str] = mapped_column(String(500), default="")
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
 

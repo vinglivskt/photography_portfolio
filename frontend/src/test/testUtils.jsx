@@ -22,6 +22,14 @@ export function stubFetchApi(options = {}) {
         json: () => Promise.resolve(collections),
       });
     }
+    const blogPath = url.split("?")[0];
+    if (/\/api\/blog\/\d+$/.test(blogPath)) {
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        text: () => Promise.resolve("not found"),
+      });
+    }
     if (url.includes("/api/blog")) {
       return Promise.resolve({
         ok: true,
@@ -33,7 +41,17 @@ export function stubFetchApi(options = {}) {
       return Promise.resolve({
         ok: true,
         status: 200,
-        json: () => Promise.resolve([]),
+        json: () =>
+          Promise.resolve([
+            {
+              id: 1,
+              title: "Услуга",
+              description: "Описание",
+              icon_class: "flaticon-camera",
+              booking_url: "https://t.me/test",
+              sort_order: 10,
+            },
+          ]),
       });
     }
     return Promise.resolve({
