@@ -5,5 +5,9 @@ __pycache__/
 .idea/
 .vscode/
 *.log
+.env
+.env.*
+backend/.env
+frontend/.env
 Thumbs.db
 .DS_Store

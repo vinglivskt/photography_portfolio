@@ -1,0 +1,77 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync project to server
+        run: |
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            --exclude "__pycache__" \
+            --exclude ".pytest_cache" \
+            --exclude ".venv" \
+            --exclude "node_modules" \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/
+
+      - name: Write production env file
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ${{ secrets.SERVER_PATH }}"
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cat > ${{ secrets.SERVER_PATH }}/.env <<'EOF'
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
+          HTTP_PORT=${{ secrets.HTTP_PORT }}
+          UPLOAD_DIR=${{ secrets.UPLOAD_DIR }}
+          LEGACY_MEDIA_IMPORT_DIR=${{ secrets.LEGACY_MEDIA_IMPORT_DIR }}
+          STATIC_SEED_IMAGES_DIR=${{ secrets.STATIC_SEED_IMAGES_DIR }}
+          FORCE_LEGACY_MEDIA_REIMPORT=${{ secrets.FORCE_LEGACY_MEDIA_REIMPORT }}
+          LEGACY_MEDIA_BIND=${{ secrets.LEGACY_MEDIA_BIND }}
+          THEME_STATIC_BIND=${{ secrets.THEME_STATIC_BIND }}
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          SMTP_USE_TLS=${{ secrets.SMTP_USE_TLS }}
+          FEEDBACK_FROM_EMAIL=${{ secrets.FEEDBACK_FROM_EMAIL }}
+          FEEDBACK_TO_EMAIL=${{ secrets.FEEDBACK_TO_EMAIL }}
+          TRAEFIK_DOMAIN=${{ secrets.TRAEFIK_DOMAIN }}
+          ACME_EMAIL=${{ secrets.ACME_EMAIL }}
+          ADMINER_PORT=${{ secrets.ADMINER_PORT }}
+          EOF"
+
+      - name: Deploy with Docker Compose
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            cd ${{ secrets.SERVER_PATH }} &&
+            docker compose pull &&
+            docker compose up -d --build &&
+            docker image prune -f
+          "
