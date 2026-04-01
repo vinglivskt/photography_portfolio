@@ -64,4 +64,6 @@ docker run -d --name portfolio_test_pg -p 5432:5432 -e POSTGRES_USER=portfolio_t
 
 ## Docker
 
-Образ API перед `uvicorn` выполняет `alembic upgrade head` от пользователя `app` (см. `docker-entrypoint.sh`).
+Образ API перед `uvicorn` выполняет `alembic upgrade head` от пользователя `app` (см. `docker-entrypoint.sh`). Миграции сериализуются через `flock` на файле в `UPLOAD_DIR`, чтобы при нескольких репликах API не было гонки `CREATE TABLE` (ошибка «relation already exists»).
+
+Traefik: в `.env` задайте `ADMINER_FQDN=adminer.<ваш домен>` (CI уже пишет это из `TRAEFIK_DOMAIN`). Правило `Host` не должно содержать подстановку `${}` внутри backticks — иначе Traefik получает лишний `\` и падает разбор правила.

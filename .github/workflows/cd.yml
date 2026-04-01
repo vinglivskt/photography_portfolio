@@ -63,6 +63,7 @@ jobs:
           FEEDBACK_FROM_EMAIL=${{ secrets.FEEDBACK_FROM_EMAIL }}
           FEEDBACK_TO_EMAIL=${{ secrets.FEEDBACK_TO_EMAIL }}
           TRAEFIK_DOMAIN=${{ secrets.TRAEFIK_DOMAIN }}
+          ADMINER_FQDN=adminer.${{ secrets.TRAEFIK_DOMAIN }}
           ACME_EMAIL=${{ secrets.ACME_EMAIL }}
           ADMINER_BASIC_AUTH_USERS=${{ secrets.ADMINER_BASIC_AUTH_USERS }}
           ADMINER_PORT=${{ secrets.ADMINER_PORT }}

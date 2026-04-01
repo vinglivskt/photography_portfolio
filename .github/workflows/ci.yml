@@ -63,6 +63,7 @@ jobs:
         env:
           ACME_EMAIL: ci@example.test
           TRAEFIK_DOMAIN: localhost
+          ADMINER_FQDN: adminer.localhost
           # Тестовая строка htpasswd (пароль «test»), только для валидации compose
           ADMINER_BASIC_AUTH_USERS: 'test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/'
         run: |
