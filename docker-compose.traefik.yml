@@ -24,13 +24,12 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.portfolio.loadbalancer.server.port=80
-      # Вся метка в двойных кавычках: иначе Docker/Compose иногда передаёт в Traefik обратный слэш перед `
-      - "traefik.http.routers.portfolio-http.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      - traefik.http.routers.portfolio-http.rule=Host(`${TRAEFIK_DOMAIN}`)
       - traefik.http.routers.portfolio-http.entrypoints=web
       - traefik.http.routers.portfolio-http.middlewares=portfolio-redirect-https
       - traefik.http.middlewares.portfolio-redirect-https.redirectscheme.scheme=https
       - traefik.http.middlewares.portfolio-redirect-https.redirectscheme.permanent=true
-      - "traefik.http.routers.portfolio.rule=Host(`${TRAEFIK_DOMAIN}`)"
+      - traefik.http.routers.portfolio.rule=Host(`${TRAEFIK_DOMAIN}`)
       - traefik.http.routers.portfolio.entrypoints=websecure
       - traefik.http.routers.portfolio.tls=true
       - traefik.http.routers.portfolio.tls.certresolver=le
@@ -40,13 +39,12 @@ services:
       - traefik.enable=true
       - traefik.http.services.adminer.loadbalancer.server.port=8080
       - traefik.http.middlewares.adminer-auth.basicauth.users=${ADMINER_BASIC_AUTH_USERS:?задайте ADMINER_BASIC_AUTH_USERS в .env (см. env.example)}
-      # FQDN целиком; по умолчанию adminer.<TRAEFIK_DOMAIN> (без ${} внутри backticks у Traefik)
-      - "traefik.http.routers.adminer.rule=Host(`${ADMINER_FQDN:-adminer.${TRAEFIK_DOMAIN}}`)"
+      - traefik.http.routers.adminer.rule=Host(`adminer.${TRAEFIK_DOMAIN}`)
       - traefik.http.routers.adminer.entrypoints=websecure
       - traefik.http.routers.adminer.tls=true
       - traefik.http.routers.adminer.tls.certresolver=le
       - traefik.http.routers.adminer.middlewares=adminer-auth
-      - "traefik.http.routers.adminer-http.rule=Host(`${ADMINER_FQDN:-adminer.${TRAEFIK_DOMAIN}}`)"
+      - traefik.http.routers.adminer-http.rule=Host(`adminer.${TRAEFIK_DOMAIN}`)
       - traefik.http.routers.adminer-http.entrypoints=web
       - traefik.http.routers.adminer-http.middlewares=adminer-redirect-https
       - traefik.http.middlewares.adminer-redirect-https.redirectscheme.scheme=https
