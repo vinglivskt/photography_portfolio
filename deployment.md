@@ -20,4 +20,6 @@ API не публикуется на хост — доступ снаружи т
 
 В репозитории включён GitHub Actions (`.github/workflows/ci.yml`): pytest, Vitest, проверка `docker compose config`.
 
-CD не привязан к конкретному хостингу: типичный вариант — отдельный workflow по `workflow_dispatch` или тегу, который по SSH выполняет `git pull` и `docker compose -f docker-compose.yml -f docker-compose.http.yml up -d --build` (или с `docker-compose.traefik.yml` для HTTPS), либо публикация образов в registry и `pull` на сервере. После смены `POSTGRES_PASSWORD` на уже заполненном volume пароль в контейнере PostgreSQL не обновится — меняйте пароль вручную в БД или пересоздайте volume (данные пропадут).
+Workflow **CD** (`.github/workflows/cd.yml`): rsync на сервер, запись `.env` из GitHub Secrets, затем `docker compose` с **`docker-compose.yml` + `docker-compose.traefik.yml`** (как при ручном деплое с HTTPS). Обязательные секреты для Traefik: **`TRAEFIK_ADMINER_HOST`**, **`ADMINER_BASIC_AUTH_USERS`** (строка htpasswd с удвоенными `$` для Docker — см. `env.example`). Строка `.env` собирается через heredoc, чтобы `$` в паролях и в Basic Auth не ломались на runner.
+
+После смены `POSTGRES_PASSWORD` на уже заполненном volume пароль в контейнере PostgreSQL не обновится — меняйте пароль вручную в БД или пересоздайте volume (данные пропадут).

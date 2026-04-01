@@ -20,7 +20,6 @@ jobs:
 
       - name: Start ssh-agent
         uses: webfactory/ssh-agent@v0.9.0
-        # Note: The ssh-agent action will automatically add the provided SSH key to the agent and set up the necessary environment variables for subsequent steps to use SSH.
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
@@ -40,16 +39,16 @@ jobs:
             --exclude "node_modules" \
             ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_PATH }}/
 
+      # Heredoc с <<'ENVEOF' — иначе bash на runner съедает $$ в htpasswd и $ в паролях
       - name: Write production env file
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p ${{ secrets.SERVER_PATH }}"
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cat > ${{ secrets.SERVER_PATH }}/.env <<EOF
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cat > ${{ secrets.SERVER_PATH }}/.env" <<'ENVEOF'
           POSTGRES_USER=${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB=${{ secrets.POSTGRES_DB }}
           DATABASE_URL=${{ secrets.DATABASE_URL }}
           CORS_ORIGINS=${{ secrets.CORS_ORIGINS }}
-          HTTP_PORT=${{ secrets.HTTP_PORT }}
           UPLOAD_DIR=${{ secrets.UPLOAD_DIR }}
           LEGACY_MEDIA_IMPORT_DIR=${{ secrets.LEGACY_MEDIA_IMPORT_DIR }}
           STATIC_SEED_IMAGES_DIR=${{ secrets.STATIC_SEED_IMAGES_DIR }}
@@ -65,21 +64,26 @@ jobs:
           FEEDBACK_TO_EMAIL=${{ secrets.FEEDBACK_TO_EMAIL }}
           TRAEFIK_DOMAIN=${{ secrets.TRAEFIK_DOMAIN }}
           ACME_EMAIL=${{ secrets.ACME_EMAIL }}
+          TRAEFIK_ADMINER_HOST=${{ secrets.TRAEFIK_ADMINER_HOST }}
+          ADMINER_BASIC_AUTH_USERS=${{ secrets.ADMINER_BASIC_AUTH_USERS }}
           ADMINER_PORT=${{ secrets.ADMINER_PORT }}
-          EOF"
+          FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}
+          ADMINER_HOST=${{ secrets.ADMINER_HOST }}
+          ENVEOF
 
       - name: Deploy with Docker Compose
         run: |
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             set -e
             cd ${{ secrets.SERVER_PATH }}
-            docker compose -f docker-compose.yml -f docker-compose.http.yml config --quiet
-            docker compose -f docker-compose.yml -f docker-compose.http.yml pull
-            if ! docker compose -f docker-compose.yml -f docker-compose.http.yml up -d --build; then
-              docker compose -f docker-compose.yml -f docker-compose.http.yml ps
-              docker compose -f docker-compose.yml -f docker-compose.http.yml logs --no-color db api nginx || true
+            export COMPOSE_FILE=docker-compose.yml:docker-compose.traefik.yml
+            docker compose config --quiet
+            docker compose pull --ignore-pull-failures || true
+            if ! docker compose up -d --build; then
+              docker compose ps
+              docker compose logs --no-color --tail=200 db api nginx traefik adminer || true
               exit 1
             fi
-            docker compose -f docker-compose.yml -f docker-compose.http.yml ps
+            docker compose ps
             docker image prune -f
           "
