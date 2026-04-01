@@ -9,9 +9,8 @@ import Lightbox from "../components/Lightbox.jsx";
 
 const FALLBACK_POSTS = THEME_IMAGES.team.map((url, i) => ({
   id: `theme-${i}`,
-  title: ["Свет и настроение", "Подготовка к съёмке", "Локации города", "Работа с моделью"][i] || `Заметка ${i + 1}`,
-  description:
-    "Здесь появятся записи из API. Этот блок повторяет сетку старого шаблона и использует ваши person_1…4.jpg.",
+  title: ["Свет в кадре", "Подготовка к съемке", "Выбор локации", "Поза и движение"][i] || `Заметка ${i + 1}`,
+  description: "Короткая заметка о процессе съемки и подготовке.",
   image_url: url,
   published_at: "—",
   external_url: "",
@@ -66,14 +65,14 @@ export default function Blog() {
     }));
 
   if (!data) {
-    return <PageHeader title="Мой блог" subtitle="Загрузка…" />;
+    return <PageHeader title="Блог" subtitle="Загрузка…" />;
   }
 
   return (
     <>
       <PageHeader
         title="Блог"
-        subtitle="Истории со съемок, советы и заметки"
+        subtitle="Короткие заметки о съемке"
       />
       <section className="portfolio-section">
         <div className="portfolio-container">
@@ -106,7 +105,7 @@ export default function Blog() {
             })}
           </div>
           {items.fromApi && data.pages > 1 ? <PaginationBar page={data.page} pages={data.pages} basePath="/blog" /> : null}
-          {!items.fromApi ? <p className="portfolio-muted-note">Пока используется демонстрационный контент</p> : null}
+          {!items.fromApi ? <p className="portfolio-muted-note">Пока показаны демонстрационные записи</p> : null}
         </div>
       </section>
       {lightboxIndex >= 0 ? (

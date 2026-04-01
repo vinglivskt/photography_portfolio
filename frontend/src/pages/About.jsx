@@ -47,7 +47,7 @@ export default function About() {
               ))}
             </div>
             <Link to="/contact" className="portfolio-btn portfolio-btn--primary">
-              Обсудить съемку
+              Записаться на съемку
             </Link>
           </article>
         </div>

@@ -53,7 +53,7 @@ export default function Collection() {
   }, [data]);
 
   if (!data) {
-    return <PageHeader title="Моя коллекция" subtitle="Загрузка…" />;
+    return <PageHeader title="Портфолио" subtitle="Загрузка…" />;
   }
 
   const empty = !data.items || data.items.length === 0;
@@ -72,7 +72,7 @@ export default function Collection() {
     <>
       <PageHeader
         title="Портфолио"
-        subtitle="Подборка работ в удобной адаптивной сетке"
+        subtitle="Избранные работы"
       />
       <section className="portfolio-section">
         <div className="portfolio-container">

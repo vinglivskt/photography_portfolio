@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap");
+
 :root {
   --bg: #f4f5f7;
   --surface: #ffffff;
@@ -15,6 +17,31 @@
   --container: min(1200px, calc(100% - 2rem));
   --shadow: 0 10px 36px rgba(11, 19, 32, 0.08);
   --space-xl: clamp(3rem, 5vw, 5rem);
+  --font-sans: "Manrope", "Inter", "Segoe UI", sans-serif;
+  --font-serif: "Playfair Display", "Cormorant Garamond", serif;
+  --font-size-12: 0.75rem;
+  --font-size-14: 0.875rem;
+  --font-size-16: 1rem;
+  --font-size-18: 1.125rem;
+  --font-size-24: 1.5rem;
+  --font-size-32: 2rem;
+  --font-size-40: 2.5rem;
+  --font-size-body: var(--font-size-16);
+  --font-size-small: var(--font-size-14);
+  --font-size-caption: var(--font-size-12);
+  --font-size-button: var(--font-size-16);
+  --font-size-h1: clamp(var(--font-size-32), 5vw, var(--font-size-40));
+  --font-size-h2: clamp(var(--font-size-24), 3.5vw, var(--font-size-32));
+  --font-size-h3: clamp(var(--font-size-18), 2.2vw, var(--font-size-24));
+  --line-height-tight: 1.2;
+  --line-height-heading: 1.15;
+  --line-height-body: 1.6;
+  --line-height-small: 1.45;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --letter-spacing-caps: 0.08em;
 }
 
 :root[data-theme="dark"] {
@@ -45,10 +72,46 @@ body,
 }
 
 body {
-  font-family: "Inter", "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  font-weight: var(--weight-regular);
   color: var(--text);
   background: var(--bg);
-  line-height: 1.55;
+  line-height: var(--line-height-body);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.01em;
+  line-height: var(--line-height-heading);
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+p,
+li,
+label {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 h1,
@@ -83,6 +146,7 @@ li {
   left: 0 !important;
   outline: none;
   min-height: calc(100vh - 72px);
+  padding-top: 72px;
   display: flex;
   flex-direction: column;
 }
@@ -139,8 +203,10 @@ img {
 }
 
 .portfolio-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(10px);
@@ -163,15 +229,16 @@ img {
 }
 
 .portfolio-brand-name {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 1.9rem;
-  line-height: 1;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-h3);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-tight);
 }
 
 .portfolio-brand-tagline {
   color: var(--text-muted);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--letter-spacing-caps);
   text-transform: uppercase;
 }
 
@@ -184,7 +251,9 @@ img {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.45rem 0.8rem;
-  font-size: 0.84rem;
+  font-size: var(--font-size-small);
+  font-weight: var(--weight-medium);
+  line-height: var(--line-height-tight);
   background: var(--surface);
   color: var(--text);
 }
@@ -203,7 +272,9 @@ img {
   padding: 0.55rem 0.85rem;
   border-radius: 999px;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: var(--font-size-small);
+  font-weight: var(--weight-medium);
+  line-height: var(--line-height-tight);
 }
 
 .portfolio-nav-link:hover,
@@ -222,15 +293,18 @@ img {
 
 .portfolio-kicker {
   margin: 0 0 0.8rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
+  font-size: var(--font-size-caption);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--letter-spacing-caps);
   text-transform: uppercase;
   color: var(--accent-soft);
 }
 
 .portfolio-lead {
   color: var(--text-muted);
-  font-size: clamp(1rem, 1.2vw, 1.15rem);
+  font-size: var(--font-size-18);
+  line-height: var(--line-height-body);
+  max-width: 62ch;
 }
 
 .portfolio-hero {
@@ -246,21 +320,23 @@ img {
 
 .portfolio-hero-copy h1 {
   margin: 0;
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(2.2rem, 5vw, 4rem);
-  line-height: 0.95;
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-heading);
 }
 
 .portfolio-hero-copy h1 span {
   display: block;
-  font-size: clamp(1.5rem, 2.8vw, 2.3rem);
+  font-size: clamp(var(--font-size-24), 2.8vw, var(--font-size-32));
+  font-weight: var(--weight-medium);
   color: var(--accent-soft);
   margin-top: 0.4rem;
 }
 
 .portfolio-hero-sub {
-  margin-top: 0.75rem;
+  margin-top: 0.45rem;
   color: var(--text-muted);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-hero-cta {
@@ -279,6 +355,10 @@ img {
   border-radius: 999px;
   border: 1px solid transparent;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  font-size: var(--font-size-button);
+  font-weight: var(--weight-medium);
+  line-height: var(--line-height-tight);
+  text-transform: none;
 }
 
 .portfolio-btn--primary {
@@ -456,14 +536,19 @@ img {
 .portfolio-lightbox-caption {
   margin: 0.7rem 0 0;
   color: #e8edf2;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-shot-meta strong {
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-tight);
 }
 
 .portfolio-shot-meta small {
-  font-size: 0.8rem;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-section-head {
@@ -473,9 +558,8 @@ img {
 .portfolio-section-head h2,
 .portfolio-page-title {
   margin: 0 0 0.6rem;
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
-  line-height: 1;
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-heading);
 }
 
 .portfolio-section-head p,
@@ -483,6 +567,7 @@ img {
   margin: 0;
   color: var(--text-muted);
   max-width: 48rem;
+  line-height: var(--line-height-body);
 }
 
 .portfolio-trust-grid,
@@ -524,8 +609,9 @@ img {
 
 .portfolio-trust-list p {
   margin: 0;
-  padding: 0.85rem 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--line);
+  line-height: 1.5;
 }
 
 .portfolio-trust-list p:last-child {
@@ -548,6 +634,7 @@ img {
 .portfolio-contact-panel p {
   margin: 0 0 0.75rem;
   color: var(--text-muted);
+  line-height: var(--line-height-body);
 }
 
 .portfolio-contact-panel img {
@@ -570,12 +657,14 @@ img {
 
 .portfolio-stat strong {
   display: block;
-  font-size: 1.25rem;
+  font-size: var(--font-size-24);
+  line-height: var(--line-height-tight);
 }
 
 .portfolio-stat span {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-blog-grid,
@@ -584,10 +673,23 @@ img {
   gap: 1rem;
 }
 
+.portfolio-service-grid--hidden {
+  display: none;
+}
+
 .portfolio-service-icon {
-  font-size: 1.8rem;
+  font-size: var(--font-size-32);
   margin-bottom: 0.8rem;
   color: var(--accent-soft);
+}
+
+.portfolio-service-card h3 {
+  margin: 0 0 0.55rem;
+}
+
+.portfolio-service-card p {
+  margin: 0;
+  color: var(--text-muted);
 }
 
 .portfolio-blog-card {
@@ -608,17 +710,20 @@ img {
 .portfolio-blog-date {
   margin: 0 0 0.35rem;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-blog-card h3 {
   margin: 0 0 0.5rem;
-  font-size: 1.1rem;
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-heading);
 }
 
 .portfolio-blog-card p {
   margin: 0;
   color: var(--text-muted);
+  line-height: var(--line-height-body);
 }
 
 .portfolio-page-header {
@@ -634,7 +739,8 @@ img {
   list-style: none;
   margin: 0 0 0.75rem;
   padding: 0;
-  font-size: 0.9rem;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-breadcrumb-item:not(:last-child)::after {
@@ -659,6 +765,8 @@ img {
   padding: 0.65rem 0.8rem;
   background: var(--surface);
   color: var(--text);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
 }
 
 .site-form textarea.form-control {
@@ -673,7 +781,9 @@ img {
 .site-form .form-label {
   display: inline-block;
   margin-bottom: 0.4rem;
-  font-size: 0.9rem;
+  font-size: var(--font-size-small);
+  font-weight: var(--weight-medium);
+  line-height: var(--line-height-small);
 }
 
 .site-alert {
@@ -698,6 +808,9 @@ img {
   border-radius: 999px;
   background: var(--surface);
   color: var(--text);
+  font-size: var(--font-size-small);
+  font-weight: var(--weight-medium);
+  line-height: var(--line-height-tight);
 }
 
 .portfolio-page-btn--active {
@@ -723,7 +836,16 @@ img {
   margin: 1rem 0 0;
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.portfolio-loading-note {
+  margin: 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .portfolio-footer {
@@ -743,8 +865,9 @@ img {
 .portfolio-footer-title {
   margin: 0 0 0.7rem;
   color: var(--text-muted);
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
+  font-size: var(--font-size-caption);
+  letter-spacing: var(--letter-spacing-caps);
+  font-weight: var(--weight-semibold);
   text-transform: uppercase;
 }
 
@@ -827,7 +950,7 @@ img {
   }
 
   .portfolio-nav-link {
-    font-size: 0.88rem;
+    font-size: var(--font-size-small);
     padding-inline: 0.7rem;
   }
 }
@@ -855,6 +978,14 @@ img {
 }
 
 @media (max-width: 760px) {
+  :root {
+    --font-size-h1: clamp(var(--font-size-24), 8vw, var(--font-size-32));
+    --font-size-h2: clamp(var(--font-size-18), 6vw, var(--font-size-24));
+    --font-size-h3: clamp(var(--font-size-16), 5.2vw, var(--font-size-18));
+    --font-size-body: 0.9375rem;
+    --font-size-button: 0.9375rem;
+  }
+
   .portfolio-header-inner {
     grid-template-columns: 1fr auto auto;
   }
@@ -862,7 +993,7 @@ img {
   .portfolio-theme-toggle {
     min-height: 40px;
     padding: 0.45rem 0.7rem;
-    font-size: 0.78rem;
+    font-size: var(--font-size-small);
   }
 
   .portfolio-menu-toggle {

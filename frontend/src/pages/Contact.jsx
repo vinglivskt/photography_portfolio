@@ -43,13 +43,13 @@ export default function Contact() {
     <>
       <PageHeader
         title="Контакты"
-        subtitle="Обсудим съемку, формат и дату"
+        subtitle="Коротко опишите задачу, и я предложу формат"
       />
       <section className="portfolio-section">
         <div className="portfolio-container portfolio-contact-layout">
           <aside className="portfolio-contact-panel">
             <h2>Связаться напрямую</h2>
-            <p>Обычно отвечаю в течение дня. Чем подробнее задача, тем точнее смогу предложить формат съемки.</p>
+            <p>Обычно отвечаю в течение дня.</p>
             {s.address ? <p><strong>Адрес:</strong> {s.address}</p> : null}
             {s.phone ? <p><strong>Телефон:</strong> <a href={`tel:${s.phone.replace(/\s/g, "")}`}>{s.phone}</a></p> : null}
             {s.email_public ? <p><strong>Email:</strong> <a href={`mailto:${s.email_public}`}>{s.email_public}</a></p> : null}
@@ -57,14 +57,14 @@ export default function Contact() {
               <p>
                 <strong>Telegram:</strong>{" "}
                 <a href={s.telegram_url} target="_blank" rel="noreferrer noopener">
-                  написать сообщение
+                  Написать в Telegram
                 </a>
               </p>
             ) : null}
             <img src={authorPhoto} alt={`Фото автора ${s.photographer_name}`} loading="lazy" />
           </aside>
           <div className="portfolio-form-wrap">
-            <h2>Оставить заявку</h2>
+            <h2>Заявка на съемку</h2>
             {status?.type === "ok" ? (
               <div className="alert alert-success site-alert" role="status">
                 {status.text}
@@ -88,7 +88,7 @@ export default function Contact() {
                   required
                   maxLength={255}
                   autoComplete="off"
-                  placeholder="Например: семейная съемка в мае"
+                  placeholder="Например: семейная съемка, май"
                 />
               </div>
               <div className="form-group mb-3">
@@ -118,7 +118,7 @@ export default function Contact() {
                   onChange={(e) => setContent(e.target.value)}
                   required
                   maxLength={8000}
-                  placeholder="Опишите задачу, желаемую дату и формат"
+                  placeholder="Цель съемки, дата, локация"
                 />
               </div>
               <button type="submit" className="portfolio-btn portfolio-btn--primary" disabled={loading}>

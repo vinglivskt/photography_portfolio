@@ -6,7 +6,7 @@ export default function PageHeader({ title, subtitle }) {
     <section className="portfolio-page-header" aria-labelledby="portfolio-page-title">
       <div className="portfolio-container">
         <nav className="portfolio-breadcrumb-nav" aria-label="Хлебные крошки">
-          <ol className="portfolio-breadcrumb-list mb-2">
+          <ol className="portfolio-breadcrumb-list">
             <li className="portfolio-breadcrumb-item">
               <Link to="/" className="portfolio-breadcrumb-link">
                     Главная

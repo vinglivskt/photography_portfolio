@@ -4,9 +4,9 @@
 export const SITE_DEFAULTS = {
   photographer_name: "Фотограф",
   page_title: "Портфолио фотографа",
-  tagline: "Фотограф\nСнимаю портреты, истории и события",
+  tagline: "Фотограф\nПортреты, пары, события",
   bio:
-    "Снимаю портреты, love story, мероприятия и коммерческие проекты. Работаю с естественным светом и в студии, помогаю с позированием и настроением кадра.",
+    "Снимаю портреты, пары и события. Помогаю с позированием и делаю естественную обработку без перегруза.",
   signature: "Фотограф",
   about_image: "/static/images/vlad.jpg",
   hero_image_1: "/static/images/vlad2.jpg",
@@ -22,7 +22,7 @@ export const SITE_DEFAULTS = {
   counter_studio: 150,
   counter_sessions: 200,
   counter_clients: 200,
-  instagram_section_title: "Follow me on Instagram",
+  instagram_section_title: "Избранные работы",
 };
 
 /**

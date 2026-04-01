@@ -6,38 +6,38 @@ import PageHeader from "../components/PageHeader.jsx";
 const STATIC_SERVICES = [
   {
     id: "static-1",
-    title: "Оборудование",
-    description: "Подбор техники под задачу: портрет, репортаж, студия.",
+    title: "Индивидуальная съемка",
+    description: "Портретная съемка в студии или на локации.",
     icon_class: "flaticon-big-lens",
   },
   {
     id: "static-2",
-    title: "Печать и ретушь",
-    description: "Обработка, цвет, подготовка файлов к печати и альбомам.",
+    title: "Парная съемка",
+    description: "Love story и семейные кадры с живой подачей.",
     icon_class: "flaticon-printing-photo",
   },
   {
     id: "static-3",
-    title: "Фокус на клиенте",
-    description: "Помогаю с позой, светом и настроением на съёмке.",
+    title: "Репортаж",
+    description: "События, праздники, концерты и рабочие процессы.",
     icon_class: "flaticon-focusing-target",
   },
   {
     id: "static-4",
-    title: "Студийные сессии",
-    description: "Полный цикл в студии: свет, фон, несколько образов.",
+    title: "Контент для бренда",
+    description: "Съемка для соцсетей, сайта и рекламных материалов.",
     icon_class: "flaticon-camera",
   },
   {
     id: "static-5",
-    title: "Серии и альбомы",
-    description: "Love story, семейные истории, отбор и последовательность кадров.",
+    title: "Ретушь и цвет",
+    description: "Базовая обработка всех кадров и аккуратная ретушь.",
     icon_class: "flaticon-polaroid-pictures",
   },
   {
     id: "static-6",
-    title: "Мероприятия",
-    description: "Корпоративы, концерты, репортаж с площадки.",
+    title: "Подготовка к съемке",
+    description: "Помощь с образом, референсами и таймингом.",
     icon_class: "flaticon-film",
   },
 ];
@@ -66,29 +66,27 @@ export default function Services() {
   return (
     <>
       <PageHeader
-        title="Услуги"
-        subtitle="Форматы съемки и постобработка"
+        title="Форматы съемки"
+        subtitle="Что можно снять и как проходит работа"
       />
       <section className="portfolio-section">
         <div className="portfolio-container">
-        {items === null ? (
-            <p className="text-muted text-center mb-0">Загрузка услуг…</p>
-        ) : null}
-          <div className={`portfolio-service-grid${items === null ? " d-none" : ""}`}>
-          {display.map((it) => (
+          {items === null ? <p className="portfolio-loading-note">Загрузка услуг…</p> : null}
+          <div className={`portfolio-service-grid${items === null ? " portfolio-service-grid--hidden" : ""}`}>
+            {display.map((it) => (
               <article key={it.id} className="portfolio-service-card">
                 <div className="portfolio-service-icon">
-                    <span className={it.icon_class || "flaticon-camera"} aria-hidden="true" />
-                  </div>
+                  <span className={it.icon_class || "flaticon-camera"} aria-hidden="true" />
+                </div>
                 <h3>{it.title}</h3>
                 <p>{it.description}</p>
               </article>
             ))}
           </div>
           {!fromApi && items != null ? (
-            <p className="portfolio-muted-note">Можно подключить API-услуги, сейчас используется демонстрационный набор</p>
+            <p className="portfolio-muted-note">Сейчас показан базовый набор форматов</p>
           ) : null}
-              </div>
+        </div>
       </section>
     </>
   );

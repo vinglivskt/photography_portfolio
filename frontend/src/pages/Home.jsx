@@ -65,11 +65,14 @@ export default function Home() {
   const tagLines = useMemo(() => {
     const raw = (s.tagline || "").split(/\n+/).map((x) => x.trim()).filter(Boolean);
     if (raw.length >= 2) return { primary: raw[0], secondary: raw.slice(1).join(" · ") };
-    if (raw.length === 1) return { primary: raw[0], secondary: "Портфолио и заказ съёмки" };
-    return { primary: "Фотограф", secondary: "Портфолио и заказ съёмки" };
+    if (raw.length === 1) return { primary: raw[0], secondary: "Портреты, пары, события" };
+    return { primary: "Фотограф", secondary: "Портреты, пары, события" };
   }, [s.tagline]);
 
   const h1 = s.photographer_name;
+  const showHeroNameAccent =
+    Boolean(tagLines.primary) &&
+    tagLines.primary.trim().toLowerCase() !== String(h1 || "").trim().toLowerCase();
   const stripTitle = s.instagram_section_title || "Избранные кадры";
   const firstSlide = heroSlides[0] || HOME_HERO_DEFAULTS[0];
   const secondSlide = heroSlides[1] || HOME_HERO_DEFAULTS[1];
@@ -82,16 +85,16 @@ export default function Home() {
             <p className="portfolio-kicker">Фотограф</p>
             <h1 id="hero-title">
               {h1}
-              <span>{tagLines.primary}</span>
+              {showHeroNameAccent ? <span>{tagLines.primary}</span> : null}
             </h1>
             <p className="portfolio-lead">{s.bio}</p>
             <p className="portfolio-hero-sub">{tagLines.secondary}</p>
             <div className="portfolio-hero-cta">
               <Link to="/collection" className="portfolio-btn portfolio-btn--primary">
-                Смотреть портфолио
+                Смотреть работы
               </Link>
               <Link to="/contact" className="portfolio-btn portfolio-btn--ghost">
-                Забронировать съемку
+                Записаться на съемку
               </Link>
             </div>
           </article>
@@ -107,7 +110,7 @@ export default function Home() {
           <div className="portfolio-section-head">
             <p className="portfolio-kicker">Портфолио</p>
             <h2 id="featured-shots">{stripTitle}</h2>
-            <p>{fromApi ? "Подборка последних работ из коллекции" : "Демонстрационные кадры из библиотеки проекта"}</p>
+            <p>{fromApi ? "Последние съемки" : "Примеры работ"}</p>
           </div>
           <div className={`portfolio-grid portfolio-grid--featured ${isLoadingCollections ? "" : "portfolio-grid--ready"}`}>
             {isLoadingCollections ? Array.from({ length: 6 }, (_, i) => (
@@ -146,20 +149,20 @@ export default function Home() {
         <div className="portfolio-container portfolio-trust-grid">
           <div>
             <p className="portfolio-kicker">Почему выбирают меня</p>
-            <h2 id="trust-section">Спокойный процесс и предсказуемый результат</h2>
+            <h2 id="trust-section">Съемка без суеты</h2>
             <p>
-              Перед съемкой обсуждаем идею, стиль и референсы. На площадке помогаю с позированием и атмосферой, после
-              съемки вы получаете отобранные и обработанные кадры в срок.
+              Перед съемкой согласуем задачу и стиль. На площадке подскажу по позированию. После съемки вы получите
+              отобранные и обработанные кадры в срок.
             </p>
             <Link to="/services" className="portfolio-btn portfolio-btn--text">
-              Посмотреть форматы съемки
+              Форматы съемки
             </Link>
           </div>
           <div className="portfolio-trust-list">
             {[
-              "Портреты, семейные съемки и мероприятия",
-              "Четкий бриф и понятные этапы работы",
-              "Аккуратная ретушь без потери естественности",
+              "Портреты, пары и события",
+              "Понятные этапы и сроки",
+              "Естественная ретушь без перегруза",
             ].map((point) => (
               <p key={point}>{point}</p>
             ))}
