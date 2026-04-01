@@ -343,6 +343,7 @@ img {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  object-position: 50% 22%;
   transition: transform 0.35s ease;
 }
 
@@ -534,11 +535,13 @@ img {
 .portfolio-contact-panel img {
   width: 100%;
   border-radius: var(--radius-lg);
-  object-fit: cover;
+  display: block;
 }
 
 .portfolio-about-photo img {
-  aspect-ratio: 4 / 5;
+  height: auto;
+  max-height: min(72vh, 760px);
+  object-fit: contain;
 }
 
 .portfolio-contact-panel p {
@@ -547,8 +550,10 @@ img {
 }
 
 .portfolio-contact-panel img {
-  aspect-ratio: 4 / 3;
   margin-top: 0.7rem;
+  height: auto;
+  max-height: min(68vh, 680px);
+  object-fit: contain;
 }
 
 .portfolio-stat-grid {
@@ -592,6 +597,7 @@ img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+  object-position: 50% 22%;
 }
 
 .portfolio-blog-card-body {
