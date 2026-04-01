@@ -23,9 +23,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    profiles: ["dev"]
+    # По умолчанию только localhost — снаружи: Traefik (см. docker-compose.traefik.yml) или ADMINER_HOST=0.0.0.0
     ports:
-      - "${ADMINER_PORT:-8080}:8080"
+      - "${ADMINER_HOST:-127.0.0.1}:${ADMINER_PORT:-8080}:8080"
     networks:
       - app-network
     environment:

@@ -303,9 +303,11 @@ npm test
 
 Запуск с Traefik:
 
-```/dev/null/commands.sh#L1-1
+```bash
 docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d --build
 ```
+
+**Adminer** (веб-доступ к PostgreSQL): сервис поднимается вместе с проектом. По умолчанию только `http://127.0.0.1:8080` на сервере; с Traefik — отдельный хост в `TRAEFIK_ADMINER_HOST`, Basic Auth в `ADMINER_BASIC_AUTH_USERS`, см. `env.example`. В форме входа: система `PostgreSQL`, сервер `db`, имя БД и пользователь из `POSTGRES_*`. Сами файлы фото Adminer не загружает — их нужно положить в том загрузок API и прописать путь в таблице (или использовать импорт из `LEGACY_MEDIA_*`).
 
 Подробности по серверному развёртыванию: `deployment.md`.
 

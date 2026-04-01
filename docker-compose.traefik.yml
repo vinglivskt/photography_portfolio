@@ -34,5 +34,21 @@ services:
       - traefik.http.routers.portfolio.tls=true
       - traefik.http.routers.portfolio.tls.certresolver=le
 
+  adminer:
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.adminer.loadbalancer.server.port=8080
+      - traefik.http.middlewares.adminer-auth.basicauth.users=${ADMINER_BASIC_AUTH_USERS:?задайте ADMINER_BASIC_AUTH_USERS в .env (см. env.example)}
+      - traefik.http.routers.adminer.rule=Host(\`${TRAEFIK_ADMINER_HOST}\`)
+      - traefik.http.routers.adminer.entrypoints=websecure
+      - traefik.http.routers.adminer.tls=true
+      - traefik.http.routers.adminer.tls.certresolver=le
+      - traefik.http.routers.adminer.middlewares=adminer-auth
+      - traefik.http.routers.adminer-http.rule=Host(\`${TRAEFIK_ADMINER_HOST}\`)
+      - traefik.http.routers.adminer-http.entrypoints=web
+      - traefik.http.routers.adminer-http.middlewares=adminer-redirect-https
+      - traefik.http.middlewares.adminer-redirect-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.adminer-redirect-https.redirectscheme.permanent=true
+
 volumes:
   traefik_letsencrypt:
