@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
-import { THEME_IMAGES } from "../config/themeImages.js";
+import { BLOG_FALLBACK_POST_URLS, GALLERY_LEN, THEME_IMAGES } from "../config/themeImages.js";
 import { fetchJson } from "../api/client.js";
 import { prefetchBlogPage } from "../utils/imagePrefetch.js";
 import PageHeader from "../components/PageHeader.jsx";
 import PaginationBar from "../components/PaginationBar.jsx";
 import Lightbox from "../components/Lightbox.jsx";
 
-const FALLBACK_POSTS = THEME_IMAGES.team.map((url, i) => ({
+const FALLBACK_POSTS = BLOG_FALLBACK_POST_URLS.map((url, i) => ({
   id: `theme-${i}`,
   title: ["Свет в кадре", "Подготовка к съемке", "Выбор локации", "Поза и движение"][i] || `Заметка ${i + 1}`,
   description: "Короткая заметка о процессе съемки и подготовке.",
@@ -48,7 +48,7 @@ export default function Blog() {
     if (!data?.items?.length) return { rows: FALLBACK_POSTS, fromApi: false };
     const mapped = data.items.map((post, i) => {
       const ph = !post.image_url || isPlaceholderAssetUrl(post.image_url);
-      const img = ph ? THEME_IMAGES.gallery[i % 12] : post.image_url;
+      const img = ph ? THEME_IMAGES.gallery[i % GALLERY_LEN] : post.image_url;
       return { ...post, display_image_url: img };
     });
     return { rows: mapped, fromApi: true };

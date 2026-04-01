@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { THEME_IMAGES } from "../config/themeImages.js";
+import { ABOUT_PORTRAIT_FALLBACK } from "../config/themeImages.js";
 import { useSiteSettings } from "../context/SettingsContext.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import { fetchJson } from "../api/client.js";
@@ -7,7 +7,7 @@ import { fetchJson } from "../api/client.js";
 /** Страница контактов и отправки заявки через форму обратной связи. */
 export default function Contact() {
   const s = useSiteSettings();
-  const authorPhoto = (s.about_image && s.about_image.trim()) || THEME_IMAGES.portraits.vlad0;
+  const authorPhoto = (s.about_image && s.about_image.trim()) || ABOUT_PORTRAIT_FALLBACK;
   const [subject, setSubject] = useState("");
   const [email, setEmail] = useState("");
   const [content, setContent] = useState("");

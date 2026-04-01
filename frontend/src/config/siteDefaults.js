@@ -1,5 +1,5 @@
 /**
- * Значения как в исходном Django-шаблоне / сидах — подставляются, если в API пустые строки.
+ * Текстовые дефолты, если в API пустые строки. Картинки — в themeImages.js и фолбэках страниц.
  */
 export const SITE_DEFAULTS = {
   photographer_name: "Фотограф",
@@ -8,9 +8,9 @@ export const SITE_DEFAULTS = {
   bio:
     "Снимаю портреты, пары и события. Помогаю с позированием и делаю естественную обработку без перегруза.",
   signature: "Фотограф",
-  about_image: "/static/images/vlad.jpg",
-  hero_image_1: "/static/images/vlad2.jpg",
-  hero_image_2: "/static/images/vlad.jpg",
+  about_image: "",
+  hero_image_1: "",
+  hero_image_2: "",
   vk_url: "",
   telegram_url: "",
   instagram_url: "",

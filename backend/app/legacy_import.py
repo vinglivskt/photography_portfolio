@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import shutil
 from datetime import date, timedelta
 from pathlib import Path
@@ -30,6 +31,12 @@ def _legacy_images_dir(legacy_root: Path) -> Path | None:
     return None
 
 
+def _natural_sort_key(path: Path) -> tuple:
+    """Сортировка 1.jpg, 2.jpg, …, 10.jpg вместо лексикографической 1,10,2."""
+    parts = re.split(r"(\d+)", path.name.lower())
+    return tuple(int(p) if p.isdigit() else p for p in parts if p)
+
+
 def _list_image_files(images_dir: Path) -> list[Path]:
     """Возвращает отсортированный список валидных файлов изображений."""
     files = [
@@ -39,13 +46,13 @@ def _list_image_files(images_dir: Path) -> list[Path]:
         and p.suffix.lower() in IMAGE_EXTENSIONS
         and not p.name.startswith(".")
     ]
-    return sorted(files, key=lambda x: x.name.lower())
+    return sorted(files, key=_natural_sort_key)
 
 
 def _theme_seed_files(images_dir: Path) -> list[Path]:
     """
-    Подбираем качественные демо-кадры из theme/static/images.
-    Берем gallery image_1..12 и портреты vlad*, если есть.
+    Демо-кадры из theme/static/images/{autor,photo}.
+    Если есть прежняя схема имён (image_*, vlad*), берём её; иначе все файлы каталога.
     """
     candidates = _list_image_files(images_dir)
     preferred: list[Path] = []

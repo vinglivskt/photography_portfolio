@@ -98,7 +98,6 @@ photography_portfolio/
 │     ├─ api/               # HTTP-клиент
 │     └─ context/           # глобальные настройки сайта
 ├─ legacy_media/            # каталог для импорта старых медиа
-├─ media/                   # дополнительные медиа проекта
 ├─ nginx/                   # конфигурация Nginx
 ├─ theme/                   # theme assets для демо-контента
 ├─ docker-compose.yml

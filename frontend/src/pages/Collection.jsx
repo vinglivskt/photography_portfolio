@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
-import { COLLECTION_EMPTY_MOSAIC, THEME_IMAGES } from "../config/themeImages.js";
+import { COLLECTION_EMPTY_MOSAIC, GALLERY_LEN, THEME_IMAGES } from "../config/themeImages.js";
 import { fetchJson } from "../api/client.js";
 import { prefetchCollectionPage } from "../utils/imagePrefetch.js";
 import PageHeader from "../components/PageHeader.jsx";
@@ -43,7 +43,7 @@ export default function Collection() {
       mode: "api",
       list: data.items.map((c, i) => {
         const ph = !c.image_url || isPlaceholderAssetUrl(c.image_url);
-        const bg = ph ? THEME_IMAGES.gallery[i % 12] : c.image_url;
+        const bg = ph ? THEME_IMAGES.gallery[i % GALLERY_LEN] : c.image_url;
         return { ...c, displayUrl: bg };
       }),
     };

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   ABOUT_PORTRAIT_FALLBACK,
   ABOUT_GALLERY_STRIP,
+  GALLERY_LEN,
   THEME_IMAGES,
 } from "../config/themeImages.js";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
@@ -54,7 +55,7 @@ export default function About() {
       if (c) {
         return {
           key: `api-${c.id}-ph`,
-          src: THEME_IMAGES.gallery[i % 12],
+          src: THEME_IMAGES.gallery[i % GALLERY_LEN],
           caption: c.title || `Кадр ${i + 1}`,
         };
       }
