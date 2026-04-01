@@ -26,7 +26,9 @@ export default function Lightbox({ items, index, onClose, onPrev, onNext }) {
           onClick={onClose}
           aria-label="Закрыть"
         >
-          <span aria-hidden="true">×</span>
+          <svg className="portfolio-lightbox-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 6L18 18M18 6L6 18" />
+          </svg>
         </button>
         <button
           type="button"
@@ -34,7 +36,9 @@ export default function Lightbox({ items, index, onClose, onPrev, onNext }) {
           onClick={onPrev}
           aria-label="Предыдущая фотография"
         >
-          <span aria-hidden="true">‹</span>
+          <svg className="portfolio-lightbox-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15 6L9 12L15 18" />
+          </svg>
         </button>
         <img src={current.src} alt={current.alt} />
         <button
@@ -43,7 +47,9 @@ export default function Lightbox({ items, index, onClose, onPrev, onNext }) {
           onClick={onNext}
           aria-label="Следующая фотография"
         >
-          <span aria-hidden="true">›</span>
+          <svg className="portfolio-lightbox-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9 6L15 12L9 18" />
+          </svg>
         </button>
         <p className="portfolio-lightbox-caption">{current.caption}</p>
       </div>

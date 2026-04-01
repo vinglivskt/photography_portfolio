@@ -425,14 +425,15 @@ img {
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-.portfolio-lightbox-btn span {
+.portfolio-lightbox-icon {
+  width: 18px;
+  height: 18px;
   display: block;
-  line-height: 1;
-  font-size: 1.5rem;
-}
-
-.portfolio-lightbox-btn--close span {
-  font-size: 1.4rem;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
 
 .portfolio-lightbox-btn--close {
