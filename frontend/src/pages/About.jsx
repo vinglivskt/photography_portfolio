@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ABOUT_PORTRAIT_FALLBACK,
   ABOUT_GALLERY_STRIP,
 } from "../config/themeImages.js";
 import { useSiteSettings } from "../context/SettingsContext.jsx";
+import { prefetchImageUrls } from "../api/client.js";
 import Lightbox from "../components/Lightbox.jsx";
 
 /** Страница с профилем фотографа, счетчиками и галереей. */
@@ -12,6 +13,11 @@ export default function About() {
   const s = useSiteSettings();
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const portrait = (s.about_image && s.about_image.trim()) || ABOUT_PORTRAIT_FALLBACK;
+
+  useEffect(() => {
+    prefetchImageUrls([portrait, ...ABOUT_GALLERY_STRIP]);
+  }, [portrait]);
+
   const stats = useMemo(
     () => [
       { label: "съемок", value: s.counter_sessions },

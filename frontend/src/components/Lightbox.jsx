@@ -1,8 +1,17 @@
 import { useEffect } from "react";
+import { prefetchImageUrls } from "../api/client.js";
 
 /** Модальное окно просмотра изображений с клавиатурной навигацией. */
 export default function Lightbox({ items, index, onClose, onPrev, onNext }) {
   const current = items[index];
+
+  useEffect(() => {
+    if (!items?.length) return;
+    const n = items.length;
+    const prev = (index - 1 + n) % n;
+    const next = (index + 1) % n;
+    prefetchImageUrls([items[prev].src, items[next].src].filter(Boolean));
+  }, [items, index]);
 
   useEffect(() => {
     const onKeyDown = (event) => {

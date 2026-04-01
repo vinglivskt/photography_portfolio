@@ -63,3 +63,13 @@ export async function fetchJson(path, options = {}) {
 export function prefetchJson(path) {
   return fetchJson(path).catch(() => null);
 }
+
+/** Подгружает изображения в кэш браузера (ускоряет смену страниц галереи). */
+export function prefetchImageUrls(urls) {
+  if (!urls?.length) return;
+  for (const u of urls) {
+    if (!u || typeof u !== "string") continue;
+    const img = new Image();
+    img.src = u;
+  }
+}

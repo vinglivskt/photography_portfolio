@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
 import { COLLECTION_EMPTY_MOSAIC, THEME_IMAGES } from "../config/themeImages.js";
-import { fetchJson, prefetchJson } from "../api/client.js";
+import { fetchJson } from "../api/client.js";
+import { prefetchCollectionPage } from "../utils/imagePrefetch.js";
 import PageHeader from "../components/PageHeader.jsx";
 import PaginationBar from "../components/PaginationBar.jsx";
 import Lightbox from "../components/Lightbox.jsx";
@@ -30,12 +31,8 @@ export default function Collection() {
 
   useEffect(() => {
     if (!data) return;
-    if (page < data.pages) {
-      prefetchJson(`/api/collections?page=${page + 1}&per_page=6`);
-    }
-    if (page > 1) {
-      prefetchJson(`/api/collections?page=${page - 1}&per_page=6`);
-    }
+    if (page < data.pages) prefetchCollectionPage(page + 1);
+    if (page > 1) prefetchCollectionPage(page - 1);
   }, [data, page]);
 
   const rows = useMemo(() => {
@@ -51,6 +48,8 @@ export default function Collection() {
       }),
     };
   }, [data]);
+
+  const isStale = Boolean(data && data.page !== page);
 
   if (!data) {
     return <PageHeader title="Портфолио" subtitle="Загрузка…" />;
@@ -74,7 +73,7 @@ export default function Collection() {
         title="Портфолио"
         subtitle="Избранные работы"
       />
-      <section className="portfolio-section">
+      <section className={`portfolio-section${isStale ? " portfolio-section--pending" : ""}`} aria-busy={isStale}>
         <div className="portfolio-container">
           {empty || rows.mode === "mosaic" ? (
             <>
@@ -130,7 +129,14 @@ export default function Collection() {
                   )
                 )}
               </div>
-              {data.pages > 1 ? <PaginationBar page={data.page} pages={data.pages} basePath="/collection" /> : null}
+              {data.pages > 1 ? (
+                <PaginationBar
+                  page={data.page}
+                  pages={data.pages}
+                  basePath="/collection"
+                  onPrefetchPage={prefetchCollectionPage}
+                />
+              ) : null}
             </>
           )}
         </div>

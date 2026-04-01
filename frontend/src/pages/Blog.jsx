@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
 import { THEME_IMAGES } from "../config/themeImages.js";
-import { fetchJson, prefetchJson } from "../api/client.js";
+import { fetchJson } from "../api/client.js";
+import { prefetchBlogPage } from "../utils/imagePrefetch.js";
 import PageHeader from "../components/PageHeader.jsx";
 import PaginationBar from "../components/PaginationBar.jsx";
 import Lightbox from "../components/Lightbox.jsx";
@@ -39,12 +40,8 @@ export default function Blog() {
 
   useEffect(() => {
     if (!data) return;
-    if (page < data.pages) {
-      prefetchJson(`/api/blog?page=${page + 1}&per_page=6`);
-    }
-    if (page > 1) {
-      prefetchJson(`/api/blog?page=${page - 1}&per_page=6`);
-    }
+    if (page < data.pages) prefetchBlogPage(page + 1);
+    if (page > 1) prefetchBlogPage(page - 1);
   }, [data, page]);
 
   const items = useMemo(() => {
@@ -68,13 +65,15 @@ export default function Blog() {
     return <PageHeader title="Блог" subtitle="Загрузка…" />;
   }
 
+  const isStale = Boolean(data.page !== page);
+
   return (
     <>
       <PageHeader
         title="Блог"
         subtitle="Короткие заметки о съемке"
       />
-      <section className="portfolio-section">
+      <section className={`portfolio-section${isStale ? " portfolio-section--pending" : ""}`} aria-busy={isStale}>
         <div className="portfolio-container">
           <div className="portfolio-blog-grid">
             {items.rows.map((post) => {
@@ -104,7 +103,9 @@ export default function Blog() {
               );
             })}
           </div>
-          {items.fromApi && data.pages > 1 ? <PaginationBar page={data.page} pages={data.pages} basePath="/blog" /> : null}
+          {items.fromApi && data.pages > 1 ? (
+            <PaginationBar page={data.page} pages={data.pages} basePath="/blog" onPrefetchPage={prefetchBlogPage} />
+          ) : null}
           {!items.fromApi ? <p className="portfolio-muted-note">Пока показаны демонстрационные записи</p> : null}
         </div>
       </section>

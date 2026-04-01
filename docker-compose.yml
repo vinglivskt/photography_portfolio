@@ -87,6 +87,8 @@ services:
       api:
         condition: service_healthy
     restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
 
 networks:
   app-network:

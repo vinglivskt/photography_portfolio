@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 
 /** Универсальная панель постраничной навигации для списков. */
-export default function PaginationBar({ page, pages, basePath, searchParam = "page" }) {
+export default function PaginationBar({ page, pages, basePath, searchParam = "page", onPrefetchPage }) {
   if (pages <= 1) return null;
+
+  const prefetch = (p) => {
+    if (typeof onPrefetchPage !== "function") return;
+    if (p >= 1 && p <= pages) onPrefetchPage(p);
+  };
 
   const makeHref = (p) => {
     const q = new URLSearchParams();
@@ -25,7 +30,12 @@ export default function PaginationBar({ page, pages, basePath, searchParam = "pa
   return (
     <nav className="pagination-bar" aria-label="Постраничная навигация">
       {page > 1 ? (
-        <Link className="portfolio-page-btn" to={makeHref(page - 1)}>
+        <Link
+          className="portfolio-page-btn"
+          to={makeHref(page - 1)}
+          onMouseEnter={() => prefetch(page - 1)}
+          onFocus={() => prefetch(page - 1)}
+        >
           &laquo;
         </Link>
       ) : null}
@@ -41,14 +51,24 @@ export default function PaginationBar({ page, pages, basePath, searchParam = "pa
               {n}
             </button>
           ) : (
-            <Link className="portfolio-page-btn" to={makeHref(n)}>
+            <Link
+              className="portfolio-page-btn"
+              to={makeHref(n)}
+              onMouseEnter={() => prefetch(n)}
+              onFocus={() => prefetch(n)}
+            >
               {n}
             </Link>
           )}
         </span>
       ))}
       {page < pages ? (
-        <Link className="portfolio-page-btn" to={makeHref(page + 1)}>
+        <Link
+          className="portfolio-page-btn"
+          to={makeHref(page + 1)}
+          onMouseEnter={() => prefetch(page + 1)}
+          onFocus={() => prefetch(page + 1)}
+        >
           &raquo;
         </Link>
       ) : null}

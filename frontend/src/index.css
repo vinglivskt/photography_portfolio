@@ -287,6 +287,11 @@ img {
   padding-block: var(--space-xl);
 }
 
+.portfolio-section--pending {
+  opacity: 0.78;
+  transition: opacity 0.15s ease;
+}
+
 .portfolio-section--alt {
   background: var(--surface-soft);
 }
@@ -379,15 +384,27 @@ img {
 
 .portfolio-hero-media {
   display: grid;
-  grid-template-columns: 1fr 0.8fr;
+  grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
+  align-items: stretch;
 }
 
-.portfolio-hero-media img {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+/* Рамка фиксирует место до загрузки картинки (меньше сдвигов). */
+.portfolio-hero-frame {
   border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface-soft);
+  aspect-ratio: 4 / 5;
+  min-height: 0;
+}
+
+.portfolio-hero-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Портреты: якорь к верху, чтобы не «съедалась» голова при cover */
+  object-position: center top;
 }
 
 .portfolio-grid {

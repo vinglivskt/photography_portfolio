@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { routeTitleForPath } from "../config/routes.js";
 import { useSiteSettings } from "../context/SettingsContext.jsx";
+import { prefetchImageUrls } from "../api/client.js";
+import { ABOUT_GALLERY_STRIP, ABOUT_PORTRAIT_FALLBACK } from "../config/themeImages.js";
+import { prefetchBlogPage, prefetchCollectionPage } from "../utils/imagePrefetch.js";
 
 const THEME_KEY = "portfolio-theme";
 const ROUTE_PREFETCHERS = {
@@ -38,6 +41,22 @@ function prefetchRouteModule(path) {
   run().catch(() => {
     PREFETCHED_ROUTES.delete(path);
   });
+}
+
+/** Прогревает JSON и превью фото для страниц с галереей. */
+function prefetchRouteGallery(path) {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (connection?.saveData) return;
+  const networkType = String(connection?.effectiveType || "");
+  if (networkType.includes("2g")) return;
+  if (path === "/collection") prefetchCollectionPage(1);
+  if (path === "/blog") prefetchBlogPage(1);
+  if (path === "/about") prefetchImageUrls([ABOUT_PORTRAIT_FALLBACK, ...ABOUT_GALLERY_STRIP]);
+}
+
+function prefetchRoute(path) {
+  prefetchRouteModule(path);
+  prefetchRouteGallery(path);
 }
 
 /** Основной каркас приложения: шапка, навигация, контент и футер. */
@@ -158,8 +177,8 @@ export default function Layout() {
                 key={item.to}
                 to={item.to}
                 end={item.end}
-                onMouseEnter={() => prefetchRouteModule(item.to)}
-                onFocus={() => prefetchRouteModule(item.to)}
+                onMouseEnter={() => prefetchRoute(item.to)}
+                onFocus={() => prefetchRoute(item.to)}
                 className={({ isActive }) => (isActive ? "portfolio-nav-link portfolio-nav-link--active" : "portfolio-nav-link")}
               >
                 {item.label}
@@ -183,8 +202,8 @@ export default function Layout() {
                     key={item.to}
                     to={item.to}
                     end={item.end}
-                    onMouseEnter={() => prefetchRouteModule(item.to)}
-                    onFocus={() => prefetchRouteModule(item.to)}
+                    onMouseEnter={() => prefetchRoute(item.to)}
+                    onFocus={() => prefetchRoute(item.to)}
                   >
                     {item.label}
                   </NavLink>

@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchJson } from "../api/client.js";
+import { fetchJson, prefetchImageUrls } from "../api/client.js";
+import {
+  collectionImageUrlsFromResponse,
+  prefetchBlogPage,
+  prefetchCollectionPage,
+} from "../utils/imagePrefetch.js";
 import { isPlaceholderAssetUrl } from "../config/siteDefaults.js";
-import { HOME_HERO_DEFAULTS, HOME_STRIP_FALLBACK, THEME_IMAGES } from "../config/themeImages.js";
+import { HOME_HERO_DEFAULTS, HOME_STRIP_FALLBACK } from "../config/themeImages.js";
 import { useSiteSettings } from "../context/SettingsContext.jsx";
 import Lightbox from "../components/Lightbox.jsx";
 
@@ -16,7 +21,10 @@ export default function Home() {
     let cancelled = false;
     fetchJson("/api/collections?page=1&per_page=12")
       .then((data) => {
-        if (!cancelled) setCollections(data.items || []);
+        if (cancelled) return;
+        setCollections(data.items || []);
+        prefetchImageUrls(collectionImageUrlsFromResponse(data));
+        if (data.pages > 1) prefetchCollectionPage(2, 6);
       })
       .catch(() => {
         if (!cancelled) setCollections([]);
@@ -24,6 +32,11 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    prefetchBlogPage(1);
+    prefetchImageUrls(HOME_STRIP_FALLBACK);
   }, []);
 
   const heroSlides = useMemo(() => {
@@ -36,6 +49,10 @@ export default function Home() {
     if (slides.length === 1) return [slides[0], HOME_HERO_DEFAULTS[1]];
     return slides;
   }, [s.hero_image_1, s.hero_image_2]);
+
+  useEffect(() => {
+    prefetchImageUrls(heroSlides);
+  }, [heroSlides]);
 
   const stripItems = useMemo(() => {
     if (collections === null) return [];
@@ -99,8 +116,12 @@ export default function Home() {
             </div>
           </article>
           <div className="portfolio-hero-media">
-            <img src={firstSlide} alt="Главная работа фотографа" loading="eager" fetchpriority="high" decoding="async" />
-            <img src={secondSlide} alt="Дополнительная работа фотографа" loading="lazy" decoding="async" />
+            <div className="portfolio-hero-frame">
+              <img src={firstSlide} alt="Главная работа фотографа" loading="eager" fetchPriority="high" decoding="async" />
+            </div>
+            <div className="portfolio-hero-frame">
+              <img src={secondSlide} alt="Дополнительная работа фотографа" loading="eager" decoding="async" />
+            </div>
           </div>
         </div>
       </section>
